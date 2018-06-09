@@ -1,0 +1,88 @@
+######################
+#+                  +#
+#     SETTINGS       #
+#+                  +#
+######################
+
+Settings:
+  DefaultColor:
+    Name: '&f'
+    Lore: '&7'
+  SimilarDegreeLimit: 0.7
+  AntiClickApamDelay: 200
+  
+######################
+#+                  +#
+#     Messages       #
+#+                  +#
+######################
+
+Messages:
+  no-help-permission: '&cYou don''t have permission to use this command.'
+  no-list-permission: '&cYou don''t have permission to use this command.'
+  no-reload-permission: '&cYou don''t have permission to use this command.'
+  no-open-permission: '&cYou don''t have permission &e{permission} &cto use this menu.'
+  no-open-other-permission: '&cYou don''t have permission to open menus for others.'
+  no_exp: '&cYou need {levels} XP levels for this.'
+  no-money: '&cYou need {money}$ for this.'
+  no-points: '&cYou need {points} player points for this.'
+  no-permission: '&cYou don''t have permission for this icon.'
+  
+######################
+#+                  +#
+#      Aliases       #
+#+                  +#
+######################
+
+Aliases:
+  'iron bar': IRON_FENCE
+  'iron bars': IRON_FENCE
+  'glass pane': THIN_GLASS
+  'nether wart': NETHER_STALK
+  'nether warts': NETHER_STALK
+  'slab': STEP
+  'double slab': DOUBLE_STEP
+  'stone brick': SMOOTH_BRICK
+  'stone bricks': SMOOTH_BRICK
+  'stone stair': SMOOTH_STAIRS
+  'stone stairs': SMOOTH_STAIRS
+  'potato': POTATO_ITEM
+  'carrot': CARROT_ITEM
+  'brewing stand': BREWING_STAND_ITEM
+  'cauldron': CAULDRON_ITEM
+  'carrot on stick': CARROT_STICK
+  'carrot on a stick': CARROT_STICK
+  'cobblestone wall': COBBLE_WALL
+  'acacia wood stairs': ACACIA_STAIRS
+  'dark oak wood stairs': DARK_OAK_STAIRS
+  'wood slab': WOOD_STEP
+  'double wood slab': WOOD_DOUBLE_STEP
+  'repeater': DIODE
+  'piston': PISTON_BASE
+  'sticky piston': PISTON_STICKY_BASE
+  'flower pot': FLOWER_POT_ITEM
+  'wood showel': WOOD_SPADE
+  'stone showel': STONE_SPADE
+  'gold showel': GOLD_SPADE
+  'iron showel': IRON_SPADE
+  'diamond showel': DIAMOND_SPADE
+  'steak': COOKED_BEEF
+  'cooked porkchop': GRILLED_PORK
+  'raw porkchop': PORK
+  'hardened clay': HARD_CLAY
+  'huge brown mushroom': HUGE_MUSHROOM_1
+  'huge red mushroom': HUGE_MUSHROOM_2
+  'mycelium': MYCEL
+  'poppy': RED_ROSE
+  'comparator': REDSTONE_COMPARATOR
+  'skull': SKULL_ITEM
+  'head': SKULL_ITEM
+  'redstone torch': REDSTONE_TORCH_ON
+  'redstone lamp': REDSTONE_LAMP_OFF
+  'glistering melon': SPECKLED_MELON
+  'acacia leaves': LEAVES_2
+  'acacia log': LOG_2
+  'gunpowder': SULPHUR
+  'lilypad': WATER_LILY
+  'command block': COMMAND
+  'dye': INK_SACK

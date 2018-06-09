@@ -1,0 +1,10 @@
+name: TabooMenu
+main: me.skymc.taboomenu.TabooMenu
+version: 1.0-SNAPSHOT
+
+author: [filoghost, 坏黑]
+softdepend: [Vault, PlayerPoints, PlaceholderAPI]
+
+commands:
+  taboomenu:
+    aliases: [tmenu, cc]
