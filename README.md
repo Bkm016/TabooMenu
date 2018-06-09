@@ -82,3 +82,8 @@ menu-settings:
 ```
 
 不想写了，突然懒惰。
+
+---
+### 声明
+
+本插件部分代码来自 **filoghost** 的开源项目 **ChestCommands**。
