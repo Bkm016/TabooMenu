@@ -26,11 +26,11 @@ public class TranslateUtils {
     }
 
     public static String format(Player player, String text) {
-        return isPlaceholderPluginEnabled() ? PlaceholderAPI.setPlaceholders(player, text) : colored(text);
+        return (isPlaceholderPluginEnabled() ? PlaceholderAPI.setPlaceholders(player, text) : colored(text)).replace("{player}", player.getName());
     }
 
     public static List<String> format(Player player, List<String> text) {
-        return isPlaceholderPluginEnabled() ? PlaceholderAPI.setPlaceholders(player, text) : colored(text);
+        return (isPlaceholderPluginEnabled() ? PlaceholderAPI.setPlaceholders(player, text) : colored(text)).stream().map(x -> x.replace("{player}", player.getName())).collect(Collectors.toList());
     }
 
     public static String colored(String text) {
