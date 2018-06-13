@@ -518,19 +518,19 @@ command: 'delay: 20'
 
 节点 `expression` 为表达式文本，并且添加了以下可用参数：
 
-**玩家对象**
+玩家对象:
 
 ```JavaScript
 player.getLevel() > 100
 ```
 
-**服务器对象**
+服务器对象:
 
 ```JavaScript
 bukkit.getOnlinePlayers().size() > 10
 ```
 
-**点击方式文本**
+点击方式文本:
 
 ```JavaScript
 clickType == "RIGHT"
