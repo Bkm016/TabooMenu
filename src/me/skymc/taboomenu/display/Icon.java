@@ -171,7 +171,7 @@ public class Icon implements Cloneable {
         if (requirements.isEmpty()) {
             return this;
         }
-        SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer()));
+        SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", "VIEW"));
         for (Requirement requirement : requirements) {
             try {
                 Object result;
