@@ -27,7 +27,7 @@
   + [点击权限](#点击权限)
   + [物品动作](#物品动作)
   + [物品条件](#物品条件)
-+ [开发者API](#开发者API)
++ [开发者工具](#开发者工具)
   + [事件](#事件)
   + [方法](#方法)
   + [命令注册](#命令注册)
@@ -632,14 +632,13 @@ expression: 'clickType == "VIEW" || clickType == "RIGHT"'
 >  如果启用预编译，则无法使用 `PlaceholderAPI` 变量
 
 ---
-### 开发者API
+### 开发者工具
 
 #### 事件
 
 TabooMenu 提供了三种关于菜单的事件。
 
 ```java
-
 /**
  * 菜单物品点击事件
  */
@@ -649,7 +648,6 @@ public void onClick(IconClickEvent e) {
     e.getPlayer().sendMessage("点击菜单：" + e.getMenu().getName());
 }
 
-
 /**
  * 菜单物品查看事件
  */
@@ -658,7 +656,6 @@ public void onClick(IconClickEvent e) {
 public void onView(IconViewEvent e) {
     e.getPlayer().sendMessage("查看菜单：" + e.getMenu().getName());
 }
-
 
 /**
  * 菜单打开事件
@@ -699,8 +696,7 @@ openMenu 方法会返回 `MenuState` 枚举类，来判断方法的执行结果�
 
 你可以通过 `IconCommandSerializer` 注册自定义的指令执行方式。
 
-**创建指令执行类**
-
+1. 创建指令执行类
 ```java
 public class TitleIconCommand extends AbstractIconCommand {
 
@@ -714,8 +710,7 @@ public class TitleIconCommand extends AbstractIconCommand {
     }
 }
 ```
-
-**注册指令执行类**
+2. 注册指令执行类
 
 ```java
 public class Main extends JavaPlugin {
