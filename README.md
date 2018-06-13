@@ -1,3 +1,4 @@
+
 # TabooMenu
 一款高自由，高效率，功能丰富的菜单插件。  
 部分代码来自 **filoghost** 的开源项目 **ChestCommands**。
@@ -6,7 +7,6 @@
 ### 插件功能
 
 + 菜单中所有节点均忽略大小写判断。
-+ 更先进的界面自动刷新方式。
 + 删除 open-with-item 节点，推荐使用 CustomJoinItem 或 BaseItem 当做菜单物品。
 + 使用 ChestCommands 格式载入，复制文件便可直接使用。
 + 保留 ChestCommands 物品配置中的大部分节点。
@@ -26,7 +26,50 @@
 + 7 种命令触发方式。
 + 11 种命令执行方式。
 + PlaceholderAPI 支持。
++ 更智能的界面刷新方式。
++ 更智能的命令系统。
 + ...
+
+---
+### 插件配置
+
+```yaml
+Settings:
+  # 默认颜色
+  DefaultColor:
+    Name: '&f'
+    Lore: '&7'
+  # 相似度匹配阈值
+  SimilarDegreeLimit: 0.7
+  # 物品点击间隔
+  AntiClickApamDelay: 200
+```
+
+---
+### 插件命令
+
+TabooMenu 保留了 ChestCommands 插件的 `cc` 指令别名，所以就算直接替换插件也不会出问题。
+
+> 你要是之前用 /chestcommands open 就当我开玩笑
+
+|  命令  |  作用  |
+| --- | --- |
+|  /taboomenu open [菜单] <玩家>  |  打开菜单  |
+|  /taboomenu list  |  列出菜单  |
+|  /taboomenu reload  |  重载插件  |
+
+如果菜单名含有空格，则使用双下划线 `__` 代替，且允许使用 `TAB` 补全菜单名。
+
+---
+### 插件权限
+
+|  权限  | 作用 |
+| --- | --- |
+| taboomenu.command.help | 查看命令帮助 |
+| taboomenu.command.open | 使用打开菜单命令 |
+| taboomenu.command.open.other | 使用打开菜单命令（向其他玩家） |
+| taboomenu.command.list | 使用列出菜单命令 |
+| taboomenu.commsnd.reload | 使用重载插件命令 |
 
 ---
 ### 创建菜单
@@ -34,7 +77,7 @@
 在路径 /plugins/TabooMenu/menu/ 内创建任意以 yml 结尾编码为 UTF-8 的文件。
 ```
 
-### 菜单设置
+### 菜单节点
 ```yaml
 # 菜单设置节点名
 menu-settings:
@@ -52,7 +95,7 @@ menu-settings:
   permission-bypass: false
 ```
 
-### 物品设置
+### 物品节点（示范）
 ```yaml
 # 物品位置，如果该名称非数字，则需要使用 POSITION-X/Y 节点。
 0:
@@ -86,7 +129,28 @@ menu-settings:
 你可以使用最少的配置做出最丰富的内容，我相信 TabooMenu 的自由度可以媲美市面上任何一款菜单插件。
 
 ---
-### 物品节点
+### 物品节点（详细）
+
+#### 序号及坐标
+
+```yaml
+# 序号方式
+0:
+  id: diamond
+# 坐标方式
+item:
+  id: diamond
+  position-x: 0
+  position-y: 0
+```
+
+可以使用以上两种方式设定物品位置，用过 ChestCommands 的话肯定对第二种方式深有感触。
+
+**序号图**  
+![](https://i.loli.net/2018/06/13/5b20bd91b2355.png)
+
+**坐标图**  
+![](https://i.loli.net/2018/06/13/5b20be2fc6b4c.png)
 
 #### 材质及数量
 
@@ -535,3 +599,99 @@ expression: 'clickType == "VIEW" || clickType == "RIGHT"'
 ```
 
 >  如果启用预编译，则无法使用 `PlaceholderAPI` 变量
+
+---
+### 开发者 API
+
+#### 事件
+
+TabooMenu 提供了三种关于菜单的事件。
+
+```java
+
+/**
+ * 菜单物品点击事件
+ */
+ 
+@Override
+public void onClick(IconClickEvent e) {
+    e.getPlayer().sendMessage("点击菜单：" + e.getMenu().getName());
+}
+
+
+/**
+ * 菜单物品查看事件
+ */
+ 
+@Override
+public void onView(IconViewEvent e) {
+    e.getPlayer().sendMessage("查看菜单：" + e.getMenu().getName());
+}
+
+
+/**
+ * 菜单打开事件
+ */
+ 
+@Override
+public void onOpen(MenuOpenEvent e) {
+    e.getPlayer().sendMessage("打开菜单：" + e.getMenu().getName());
+}
+```
+
+如果你在 `IconViewEvent` 中取消了事件。那么物品将不会展示给玩家，但是玩家依旧可以点击对应位置来触发效果，所以还需要在 `IconClickEvent` 中进行二次判断。
+
+#### 方法
+
+```java
+TabooMenuAPI.openMenu(Player 玩家, String 菜单名, Boolean 是否跳过权限判断)
+TabooMenuAPI.getCurrentMenu(Player 玩家)
+TabooMenuAPI.getMenus()
+```
+
+TabooMenu 提供了以上 3 种可供直接调用的方法，用于打开菜单和获取菜单。
+
+```java
+// 菜单已打开
+OPENED
+// 权限不足
+NO_PERMISSION
+// 菜单不存在
+NOT_FOUND_MENU
+// 其他错误
+UNKNOWN
+```
+
+openMenu 方法会返回 `MenuState` 枚举类，来判断方法的执行结果。
+
+#### 指令注册
+
+你可以通过 `IconCommandSerializer` 注册自定义的指令执行方式。
+
+**创建指令执行类**
+
+```java
+public class TitleIconCommand extends AbstractIconCommand {
+
+    public TitleIconCommand(String command) {
+        super(command);
+    }
+
+    @Override
+    public void execute(Player player) {
+        TitleUtils.sendTitle(player, command, "", 10, 40, 10):
+    }
+}
+```
+
+**注册指令执行类**
+
+```java
+public class Main extends JavaPlugin {
+
+    @Override
+    public void onEnable() {
+        IconCommandSerializer.registerCommand("title:", TitleIconCommand.class);
+    }
+}
+```
