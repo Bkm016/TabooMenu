@@ -9,6 +9,7 @@ import me.skymc.taboomenu.listener.ListenerInventory;
 import me.skymc.taboomenu.logger.TLogger;
 import me.skymc.taboomenu.serialize.MenuSerializer;
 import me.skymc.taboomenu.support.EconomyBridge;
+import me.skymc.taboomenu.support.PlaceholderHook;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.VersionUtils;
@@ -61,11 +62,14 @@ public class TabooMenu extends JavaPlugin {
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         }
 
+        new PlaceholderHook(this, "taboomenu").hook();
+
         new BukkitRunnable() {
 
             @Override
             public void run() {
                 long times = System.currentTimeMillis();
+
                 List<String> errors = new ArrayList<>();
                 load(errors);
 

@@ -27,6 +27,7 @@ Messages:
   no-money: '&cYou need {money}$ for this.'
   no-points: '&cYou need {points} player points for this.'
   no-permission: '&cYou don''t have permission for this icon.'
+  no-required-item: '&cYou don''t have required item for this icon.'
   
 ######################
 #+                  +#

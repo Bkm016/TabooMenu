@@ -57,6 +57,11 @@ public enum IconSettings {
     LEVELS("LEVELS"),
 
     /**
+     * 消耗物品
+     */
+    REQUIRED_ITEM("REQUIRED-ITEM"),
+
+    /**
      * 点击权限
      */
     PERMISSION("PERMISSION"),

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.display.data.ClickType;
+import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
@@ -63,6 +64,7 @@ public class Icon implements Cloneable {
     private Set<Integer> slotCopy = new HashSet<>();
     private List<Requirement> requirements = new ArrayList<>();
     private List<IconCommand> iconCommands = new ArrayList<>();
+    private List<RequiredItem> requiredItems = new ArrayList<>();
 
     public Icon(Material material, short data, int amount) {
         this.material = material;
@@ -125,6 +127,13 @@ public class Icon implements Cloneable {
             }
         }
 
+        if (!requiredItems.isEmpty()) {
+            if (requiredItems.stream().anyMatch(x -> !x.hasItem(player))) {
+                player.sendMessage(TranslateUtils.getMessage("no-required-item"));
+                return;
+            }
+        }
+
         // ****************************************
         //
         //           Take Requirement
@@ -143,6 +152,10 @@ public class Icon implements Cloneable {
 
         if (icon.levels > 0) {
             player.setLevel(player.getLevel() - icon.levels);
+        }
+
+        if (!requiredItems.isEmpty()) {
+            requiredItems.forEach(x -> x.takeItem(player));
         }
 
         executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
@@ -405,6 +418,10 @@ public class Icon implements Cloneable {
 
     public List<IconCommand> getIconCommands() {
         return iconCommands;
+    }
+
+    public List<RequiredItem> getRequiredItems() {
+        return requiredItems;
     }
 
     public void setIconCommands(List<IconCommand> iconCommands) {

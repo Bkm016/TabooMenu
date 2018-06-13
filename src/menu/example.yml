@@ -17,177 +17,133 @@ menu-settings:
   command: 'menu'
 
   # auto-refresh - OPTIONAL
-  # How frequently the menu will be refreshed, in seconds.
-  # Useful if you have variables in items' descriptions.
+  # How frequently the menu will be refreshed. few seconds
   auto-refresh: 5
 
   # This command command will be execute when the menu is opened.
   # Supports all the icon command types.
-  open-action: 'sound: note pling; tell: &eYou opened the example menu.'
+  open-action: 'sound: BLOCK_CHEST_OPEN-1-1; tell: &eYou opened the example menu.'
 
-  # open-with-item - OPTIONAL
-  # The menu will open only right-clicking with orange wool [35:1]
-  open-with-item:
-    id: wool:1
-    left-click: false
-    right-click: true
-
-
+  
 ######################
 #+                  +#
 #       ITEMS        #
 #+                  +#
 ######################
 
+0:
+  id: bed
+  name: '&e/spawn'
+  lore:
+  - 'It justs executes /spawn'
+  - 'as the player who clicked.'
+  command: 'spawn'
 
-spawncmd:
-  COMMAND: 'spawn'
-  NAME: '&e/spawn'
-  LORE:
-    - 'It justs executes /spawn'
-    - 'as the player who clicked.'
-  ID: bed
-  POSITION-X: 1
-  POSITION-Y: 1
+  
+1:
+  id: wool:1
+  name: '&aWool with additional data'
+  lore:
+  - 'This wool has a data value, an amount'
+  - 'greater than 1, and two enchantments.'
+  amount: 1
+  shiny: true
 
+  
+2:
+  id: paper
+  name: '&dFormatting codes'
+  lore:
+  - 'You can use all the formatting codes!'
+  - '&fColors: &c#c &a#a &9#9 &e#e &f... ...'
+  - '&fRandom (#k): &kfy379!H'
+  - '&fBold (#l): &lexample'
+  - '&fStrikethrough (#m): &mexample'
+  - '&fUnderline (#n): &nexample'
+  - '&fItalic (#o): &oexample'
 
-colored-enchanted-stacked-wool:
-  NAME: '&aWool with additional data'
-  LORE:
-    - 'This wool has a data value, an amount'
-    - 'greater than 1, and two enchantments.'
-  ID: wool
-  DATA-VALUE: 1
-  AMOUNT: 10
-  ENCHANTMENT: knockback, 10; durability, 10
-  POSITION-X: 2
-  POSITION-Y: 1
-
-
-this-text-will-not-appear:
-  NAME: '&dFormatting codes'
-  LORE:
-    - 'You can use all the formatting codes!'
-    - '&fColors: &c#c &a#a &9#9 &e#e &f... ...'
-    - '&fRandom (#k): &kfy379!H'
-    - '&fBold (#l): &lexample'
-    - '&fStrikethrough (#m): &mexample'
-    - '&fUnderline (#n): &nexample'
-    - '&fItalic (#o): &oexample'
-  ID: paper
-  POSITION-X: 3
-  POSITION-Y: 1
-
-
-test-from-console:
-  COMMAND: 'console: say Hello {player}!'
-  NAME: '&cRuns command from the console.'
-  LORE:
-    - 'It broadcasts your name with the command /say.'
-  ID: command block
-  POSITION-X: 4
-  POSITION-Y: 1
+  
+3:
+  id: command block
+  name: '&cRuns command from the console.'
+  lore:
+  - 'It broadcasts your name with the command /say.'
+  command: 'console: say Hello {player}!'
 
 
-test-as-op:
-  COMMAND: 'op: say Hello world!'
-  NAME: '&cRuns command as OP.'
-  LORE:
-    - 'Be careful with this type of commands.'
-    - 'It will ignore nearly all the permissions.'
-  ID: command block
-  POSITION-X: 5
-  POSITION-Y: 1
+4:
+  id: command block
+  name: '&cRuns command as OP.'
+  lore:
+  - 'Be careful with this type of commands.'
+  - 'It will ignore nearly all the permissions.'
+  command: 'op: say Hello world!'
 
 
-test-with-placeholder:
-  COMMAND: 'tell: &9Online players: &f{online}/{max_players}; tell: &9Your name: &f{player}; tell: &9The world you are in: &f{world}; tell: &9Money: &f{money}'
-  NAME: '&6This message contains some placeholders'
-  LORE:
-    - 'Placeholders will be replaced when the item'
-    - 'is clicked.'
-  ID: empty map
-  POSITION-X: 6
-  POSITION-Y: 1
+5:
+  id: empty map
+  name: '&6This message using "&ePlaceholderAPI&6"'
+  lore:
+  - 'Placeholders will be replaced when the item'
+  - 'is clicked.'
+  command: 'tell: &9Online players: &f%server_online%/%server_max_players%; tell: &9Your name: &f%player_name%; tell: &9The world you are in: &f%player_world%; tell: &9Money: &f%taboomenu_money%'
 
 
-economy-give:
-  COMMAND: 'tell: &aYou have paid 50$ for this command!; give: gold_ingot'
-  NAME: '&eEconomy & Give command'
-  LORE:
-    - 'This command will be executed'
-    - 'only if you have at least 50$!'
-    - 'It gives you a gold ingot.'
-  ID: gold ingot
-  PRICE: 50
-  POSITION-X: 7
-  POSITION-Y: 1
+6:
+  id: gold ingot
+  name: '&eEconomy & Give command'
+  lore:
+  - 'This command will be executed'
+  - 'only if you have at least 50$!'
+  - 'It gives you a gold ingot.'
+  price: 50
+  command: 'tell: &aYou have paid 50$ for this command!; console: give {player} gold_ingot'
 
 
-economy-take:
-  REQUIRED-ITEM: 'gold_ingot'
-  COMMAND: 'tell: &aYou have been paid 50$; givemoney: 50'
-  NAME: '&eEconomy & Required item'
-  LORE:
-    - 'This command is the opposite of the previous.'
-    - 'It will take you a gold ingot and give you $50.'
-  ID: gold ingot
-  POSITION-X: 8
-  POSITION-Y: 1
+7:
+  id: gold ingot
+  name: '&eEconomy & Required item'
+  lore:
+  - 'This command is the opposite of the previous.'
+  - 'It will take you a gold ingot and give you $50.'
+  required-item: 'material:gold_ingot'
+  command: 'tell: &aYou have been paid 50$; console: money give 50'
 
 
-will-not-close:
-  NAME: '&2Info'
-  LORE:
-    - '&7The menu will not close'
-    - '&7clicking on this item.'
-  ID: sign
-  KEEP-OPEN: true
-  POSITION-X: 9
-  POSITION-Y: 1
+8:
+  id: head:3
+  name: '&3Tells you something.'
+  lore:
+  - '&7It tells you something without commands.'
+  command: 'tell: This is a simple message, without using commands!'
+  skull-owner: '{player}'
 
 
-a-talking-head:
-  COMMAND: 'tell: This is a simple message, without using commands!'
-  NAME: '&3Tells you something.'
-  LORE:
-    - '&7It tells you something without commands.'
-  ID: head
-  DATA-VALUE: 3
-  POSITION-X: 1
-  POSITION-Y: 2
+9:
+  id: golden apple
+  name: '&aMultiple commands'
+  lore:
+  - 'Example of multiple commands.'
+  command: 'console: Say Did you know that...; console: say you can run multiple commands?;'
 
 
-test-multiple-command:
-  COMMAND: 'console: Say Did you know that...; console: say you can run multiple commands?;'
-  NAME: '&aMultiple commands'
-  LORE:
-    - 'Example of multiple commands.'
-  ID: golden apple
-  POSITION-X: 2
-  POSITION-Y: 2
+10:
+  id: iron bar
+  name: '&8Permission test'
+  lore:
+  - 'To use this item, you need the'
+  - 'permission "taboomenu.test".'
+  - 'Otherwise, a configurable error'
+  - 'message will be displayed.'
+  command: 'tell: &aYou have the correct permission!'
+  permission: taboomenu.test
+  permission-message: 'You don''t have the correct permission!'
 
 
-permission:
-  COMMAND: 'tell: &a[v] You have the correct permission!'
-  NAME: '&8Permission test'
-  LORE:
-    - 'To use this item, you need the'
-    - 'permission "chestcommands.test".'
-    - 'Otherwise, a configurable error'
-    - 'message will be displayed.'
-  ID: iron bar
-  POSITION-X: 3
-  POSITION-Y: 2
-  PERMISSION: chestcommands.test
-  PERMISSION-MESSAGE: 'You don''t have the correct permission!'
-
-
-menu-close-no-commands-no-lore:
-  NAME: '&6Close the menu'
-  ID: redstone lamp
-  LORE:
-    - 'Create an item without command,'
-    - 'the GUI will just close.'
-  POSITION-X: 9
-  POSITION-Y: 3
+26:
+  name: '&6Close the menu'
+  id: redstone lamp
+  lore:
+  - 'Create an item without command,'
+  - 'the GUI will just close.'
+  command: 'close'

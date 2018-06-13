@@ -3,6 +3,7 @@ package me.skymc.taboomenu.serialize;
 import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.display.Icon;
+import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.util.MapUtils;
@@ -88,6 +89,10 @@ public class IconSerializer {
             loadRequirements(map, iconName, fileName, errors, icon);
         }
 
+        if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIRED_ITEM.getText())) {
+            loadRequiredItems(map, icon);
+        }
+
         if (!icon.getRequirements().isEmpty()) {
             icon.getRequirements().sort(Comparator.comparingInt(Requirement::getPriority));
         }
@@ -118,6 +123,15 @@ public class IconSerializer {
             icon.setShiny(true);
         }
         icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), ""));
+    }
+
+    private static void loadRequiredItems(Map<String, Object> map, Icon icon) {
+        Object requiredItemObject = map.entrySet().stream().filter(entry -> IconSettings.REQUIRED_ITEM.getText().equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().get().getValue();
+        for (Object requiredItemOrigin : requiredItemObject instanceof List ? (List) requiredItemObject : Collections.singletonList(requiredItemObject)) {
+            for (String requiredItemSource : requiredItemOrigin.toString().split(";")) {
+                icon.getRequiredItems().add(RequiredItem.valueOf(requiredItemSource));
+            }
+        }
     }
 
     private static void loadSlotCopy(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
