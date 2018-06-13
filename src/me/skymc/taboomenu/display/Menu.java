@@ -1,6 +1,7 @@
 package me.skymc.taboomenu.display;
 
 import me.skymc.taboomenu.TabooMenu;
+import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.event.IconViewEvent;
 import me.skymc.taboomenu.event.MenuOpenEvent;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
@@ -74,7 +75,7 @@ public class Menu {
                 IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
                 Bukkit.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
-                    inventory.setItem(entry.getKey(), entry.getValue().getEffectiveIcon(player).createItemStack(player));
+                    inventory.setItem(entry.getKey(), entry.getValue().getEffectiveIcon(player, ClickType.VIEW).createItemStack(player));
                 }
             }
         }

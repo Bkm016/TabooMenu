@@ -71,7 +71,7 @@ public class Icon implements Cloneable {
     }
 
     public void onClick(Player player, ClickType clickType) {
-        Icon icon = getEffectiveIcon(player);
+        Icon icon = getEffectiveIcon(player, clickType);
 
         IconClickEvent event = new IconClickEvent(player, TabooMenuAPI.getPlayerCurrentMenu(player), this);
         Bukkit.getPluginManager().callEvent(event);
@@ -167,11 +167,11 @@ public class Icon implements Cloneable {
         return StringUtils.isBlank(permissionView) || (permissionView.startsWith("-") ? !player.hasPermission(permissionView.substring(1)) : player.hasPermission(permissionView));
     }
 
-    public Icon getEffectiveIcon(Player player) {
+    public Icon getEffectiveIcon(Player player, ClickType clickType) {
         if (requirements.isEmpty()) {
             return this;
         }
-        SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", "VIEW"));
+        SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name()));
         for (Requirement requirement : requirements) {
             try {
                 Object result;
