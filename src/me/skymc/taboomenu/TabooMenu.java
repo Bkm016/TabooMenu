@@ -1,6 +1,7 @@
 package me.skymc.taboomenu;
 
 import com.google.common.io.Files;
+import me.skymc.taboomenu.bstats.Metrics;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
@@ -19,6 +20,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +63,8 @@ public class TabooMenu extends JavaPlugin {
         if (Bukkit.getMessenger().isOutgoingChannelRegistered(this, "BungeeCord")) {
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         }
+
+        new Metrics(this);
 
         new PlaceholderHook(this, "taboomenu").hook();
 
