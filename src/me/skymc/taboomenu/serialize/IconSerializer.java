@@ -8,9 +8,9 @@ import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.block.banner.PatternType;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,10 +50,11 @@ public class IconSerializer {
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.LORE.getText())) {
-            icon.setLore(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LORE.getText(), Collections.emptyList()));
-            List<String> collect = icon.getLore().stream().map(x -> TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Lore", "&7") + x).collect(Collectors.toList());
-            icon.getLore().clear();
-            icon.getLore().addAll(collect);
+            icon.setLore(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LORE.getText(), Collections.emptyList()).stream().map(x -> TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Lore", "&7") + x).collect(Collectors.toList()));
+        }
+
+        if (MapUtils.containsIgnoreCase(map, IconSettings.BANNER_PATTERN.getText())) {
+            icon.setBannerPatterns(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.BANNER_PATTERN.getText(), Collections.emptyList()));
         }
 
         double price = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PRICE.getText(), 0).doubleValue();

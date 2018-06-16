@@ -60,7 +60,7 @@ public class TabooMenu extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ListenerCommand(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerInventory(), this);
 
-        if (Bukkit.getMessenger().isOutgoingChannelRegistered(this, "BungeeCord")) {
+        if (!Bukkit.getMessenger().isOutgoingChannelRegistered(this, "BungeeCord")) {
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         }
 

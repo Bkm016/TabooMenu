@@ -15,22 +15,18 @@ import me.skymc.taboomenu.support.PlayerPointsBridge;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Material;
+import me.skymc.taboomenu.util.VersionUtils;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import javax.swing.text.IconView;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,6 +42,7 @@ public class Icon implements Cloneable {
 
     private String name;
     private List<String> lore;
+    private List<String> bannerPatterns;
 
     private Color color;
     private String skullOwner;
@@ -127,8 +124,8 @@ public class Icon implements Cloneable {
             }
         }
 
-        if (!requiredItems.isEmpty()) {
-            if (requiredItems.stream().anyMatch(x -> !x.hasItem(player))) {
+        if (!icon.requiredItems.isEmpty()) {
+            if (icon.requiredItems.stream().anyMatch(x -> !x.hasItem(player))) {
                 player.sendMessage(TranslateUtils.getMessage("no-required-item"));
                 return;
             }
@@ -154,8 +151,8 @@ public class Icon implements Cloneable {
             player.setLevel(player.getLevel() - icon.levels);
         }
 
-        if (!requiredItems.isEmpty()) {
-            requiredItems.forEach(x -> x.takeItem(player));
+        if (!icon.requiredItems.isEmpty()) {
+            icon.requiredItems.forEach(x -> x.takeItem(player));
         }
 
         executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
@@ -222,6 +219,25 @@ public class Icon implements Cloneable {
 
         if (!StringUtils.isBlank(skullOwner) && itemMeta instanceof SkullMeta) {
             ((SkullMeta) itemMeta).setOwner(TranslateUtils.format(player, skullOwner));
+        }
+
+        if (bannerPatterns != null && VersionUtils.getVersionNumber() >= 10900 && itemMeta instanceof org.bukkit.inventory.meta.BannerMeta) {
+            for (String patternStr : bannerPatterns) {
+                String[] type = patternStr.split(" ");
+                if (type.length == 1) {
+                    try {
+                        ((org.bukkit.inventory.meta.BannerMeta) itemMeta).setBaseColor(DyeColor.valueOf(type[0].toUpperCase()));
+                    } catch (Exception ignored) {
+                        ((org.bukkit.inventory.meta.BannerMeta) itemMeta).setBaseColor(DyeColor.BLACK);
+                    }
+                } else if (type.length == 2) {
+                    try {
+                        ((org.bukkit.inventory.meta.BannerMeta) itemMeta).addPattern(new org.bukkit.block.banner.Pattern(DyeColor.valueOf(type[0].toUpperCase()), org.bukkit.block.banner.PatternType.valueOf(type[1].toUpperCase())));
+                    } catch (Exception ignored) {
+                        ((org.bukkit.inventory.meta.BannerMeta) itemMeta).addPattern(new org.bukkit.block.banner.Pattern(DyeColor.BLACK, org.bukkit.block.banner.PatternType.BASE));
+                    }
+                }
+            }
         }
 
         itemStack.setItemMeta(itemMeta);
@@ -426,5 +442,13 @@ public class Icon implements Cloneable {
 
     public void setIconCommands(List<IconCommand> iconCommands) {
         this.iconCommands = iconCommands;
+    }
+
+    public List<String> getBannerPatterns() {
+        return bannerPatterns;
+    }
+
+    public void setBannerPatterns(List<String> bannerPatterns) {
+        this.bannerPatterns = bannerPatterns;
     }
 }

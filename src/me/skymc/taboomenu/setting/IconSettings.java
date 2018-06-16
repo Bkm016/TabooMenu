@@ -37,6 +37,11 @@ public enum IconSettings {
     SKULL_OWNER("SKULL-OWNER"),
 
     /**
+     * 旗帜图案
+     */
+    BANNER_PATTERN("BANNER-PATTERN"),
+
+    /**
      * 触发命令
      */
     COMMAND("COMMAND"),

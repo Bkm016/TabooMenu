@@ -138,8 +138,18 @@ menu-settings:
   command: 'tell: &aYou have the correct permission!'
   permission: taboomenu.test
   permission-message: 'You don''t have the correct permission!'
+  
+  
+11:
+  id: banner
+  name: 'Banner patterns &8(1.9+)'
+  lore:
+  - 'Example of banner patterns'
+  banner-pattern:
+  - 'BLACK MOJANG'
+  - 'WHITE'
 
-
+  
 26:
   name: '&6Close the menu'
   id: redstone lamp
