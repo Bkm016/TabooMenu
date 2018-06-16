@@ -23,6 +23,7 @@
   + [属性隐藏](#属性隐藏)
   + [头颅皮肤](#头颅皮肤)
   + [皮革颜色](#皮革颜色)
+  + [旗帜图案](#旗帜图案)
   + [查看权限](#查看权限)
   + [点击条件](#点击条件)
   + [所需物品](#所需物品)
@@ -313,7 +314,8 @@ Aliases:
   skull-owner: '%player_name%'
 ```
 
-如果你的服务器安装了 `PlaceholderAPI` 插件，你可以在这里使用其他变量。
+用于给 `head:3` 材质赋予自定义皮肤。  
+如果你的服务器安装了 `PlaceholderAPI` 插件，你可以在这里使用其他变量如：`%XXX_top_kills_1%`。
 
 #### 皮革颜色
 
@@ -323,7 +325,40 @@ Aliases:
   color: 255,255,0
 ```
 
-用于设置皮革护甲的颜色
+用于给 `leader helmet` `leader chesplate` `leader leggings` `leader boots` 材质赋予自定义颜色。
+
+#### 旗帜图案
+
+```yaml
+0:
+  id: banner
+  banner-pattern:
+  - 'RED MOJANG'
+  - 'WHITE'
+```
+
+用于给 `banner` 材质赋予自定义图案。  
+如果你们使用过其他自定义旗帜插件的话应该对这种写法并不陌生，如果你们还是不了解，来分析一下下面这段配置：
+
+```yaml
+0:
+  id: banner
+  banner-pattern:
+  # 添加红色 `SQUARE_BOTTOM_LEFT` 图案
+  - 'RED SQUARE_BOTTOM_LEFT'
+  # 添加红色 `SQUARE_BOTTOM_RIGHT` 图案
+  - 'RED SQUARE_BOTTOM_RIGHT'
+  # 添加红色 `SQUARE_TOP_LEFT` 图案
+  - 'RED SQUARE_TOP_LEFT'
+  # 添加红色 `SQUARE_TOP_RIGHT` 图案
+  - 'RED SQUARE_TOP_RIGHT'
+  # 设置旗帜基础颜色为白色
+  - 'WHITE'
+```
+
+相关连接：
+  + 颜色列表：https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/DyeColor.html
+  + 图案列表：https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html
 
 #### 查看权限
 
