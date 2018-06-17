@@ -1,20 +1,21 @@
 package me.skymc.taboomenu.iconcommand.impl;
 
+import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import org.bukkit.entity.Player;
 
 /**
  * @Author sky
- * @Since 2018-06-05 20:20
+ * @Since 2018-06-06 22:34
  */
-public class CloseMenuIconCommand extends AbstractIconCommand {
+public class IconCommandOpenForce extends AbstractIconCommand {
 
-    public CloseMenuIconCommand(String command) {
+    public IconCommandOpenForce(String command) {
         super(command);
     }
 
     @Override
     public void execute(Player player) {
-        player.closeInventory();
+        TabooMenuAPI.openMenu(player, command, true);
     }
 }

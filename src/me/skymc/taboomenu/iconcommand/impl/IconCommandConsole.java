@@ -11,20 +11,19 @@ import java.text.MessageFormat;
  * @Author sky
  * @Since 2018-06-05 20:20
  */
-public class BroadcastIconCommand extends AbstractIconCommand {
+public class IconCommandConsole extends AbstractIconCommand {
 
-
-    public BroadcastIconCommand(String command) {
+    public IconCommandConsole(String command) {
         super(command);
     }
 
     @Override
     public void execute(Player player) {
-        Bukkit.broadcastMessage(TranslateUtils.format(player, command));
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), TranslateUtils.format(player, command));
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("BroadcastIconCommand'{'command=''{0}'''}'", command);
+        return MessageFormat.format("IconCommandConsole'{'command=''{0}'''}'", command);
     }
 }

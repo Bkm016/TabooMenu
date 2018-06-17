@@ -21,18 +21,18 @@ public class PlayerPointsBridge {
     }
 
     public static boolean hasValidPlugin() {
-        return playerPoints == null;
+        return playerPoints != null;
     }
 
     public static int getPoints(Player player) {
-        if (hasValidPlugin()) {
+        if (!hasValidPlugin()) {
             throw new IllegalStateException("PlayerPoints plugin was not found!");
         }
         return playerPoints.getAPI().look(player.getUniqueId());
     }
 
     public static boolean hasPoints(Player player, int minimum) {
-        if (hasValidPlugin()) {
+        if (!hasValidPlugin()) {
             throw new IllegalStateException("PlayerPoints plugin was not found!");
         }
         if (minimum < 0) {
@@ -45,7 +45,7 @@ public class PlayerPointsBridge {
      * @return true if the operation was successful.
      */
     public static boolean takePoints(Player player, int points) {
-        if (hasValidPlugin()) {
+        if (!hasValidPlugin()) {
             throw new IllegalStateException("PlayerPoints plugin was not found!");
         }
         if (points < 0) {
@@ -56,7 +56,7 @@ public class PlayerPointsBridge {
 
 
     public static boolean givePoints(Player player, int points) {
-        if (hasValidPlugin()) {
+        if (!hasValidPlugin()) {
             throw new IllegalStateException("PlayerPoints plugin was not found!");
         }
         if (points < 0) {

@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
  * @Author sky
  * @Since 2018-06-06 22:34
  */
-public class OpenMenuIconCommand extends AbstractIconCommand {
+public class IconCommandOpen extends AbstractIconCommand {
 
-    public OpenMenuIconCommand(String command) {
+    public IconCommandOpen(String command) {
         super(command);
     }
 

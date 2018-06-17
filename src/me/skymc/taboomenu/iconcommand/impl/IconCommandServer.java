@@ -11,9 +11,9 @@ import java.text.MessageFormat;
  * @Author sky
  * @Since 2018-06-05 20:20
  */
-public class ServerIconCommand extends AbstractIconCommand {
+public class IconCommandServer extends AbstractIconCommand {
 
-    public ServerIconCommand(String command) {
+    public IconCommandServer(String command) {
         super(command);
     }
 
@@ -24,6 +24,6 @@ public class ServerIconCommand extends AbstractIconCommand {
 
     @Override
     public String toString() {
-        return MessageFormat.format("ServerIconCommand'{'command=''{0}'''}'", command);
+        return MessageFormat.format("IconCommandServer'{'command=''{0}'''}'", command);
     }
 }

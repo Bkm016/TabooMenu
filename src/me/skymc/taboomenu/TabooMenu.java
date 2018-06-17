@@ -7,6 +7,7 @@ import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.listener.ListenerCommand;
 import me.skymc.taboomenu.listener.ListenerInventory;
+import me.skymc.taboomenu.listener.ListenerPlayer;
 import me.skymc.taboomenu.logger.TLogger;
 import me.skymc.taboomenu.serialize.MenuSerializer;
 import me.skymc.taboomenu.support.EconomyBridge;
@@ -57,6 +58,7 @@ public class TabooMenu extends JavaPlugin {
         Bukkit.getPluginCommand("taboomenu").setExecutor(new TabooMenuCommand());
         Bukkit.getPluginCommand("taboomenu").setTabCompleter(new TabooMenuCommand());
 
+        Bukkit.getPluginManager().registerEvents(new ListenerPlayer(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerCommand(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerInventory(), this);
 
@@ -64,9 +66,8 @@ public class TabooMenu extends JavaPlugin {
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         }
 
-        new Metrics(this);
-
-        new PlaceholderHook(this, "taboomenu").hook();
+        new Metrics(inst);
+        new PlaceholderHook(inst, "taboomenu").hook();
 
         new BukkitRunnable() {
 

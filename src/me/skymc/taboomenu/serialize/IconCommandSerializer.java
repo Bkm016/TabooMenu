@@ -21,16 +21,21 @@ public class IconCommandSerializer {
     private static HashMap<Pattern, Class<? extends AbstractIconCommand>> commandTypes = new HashMap<>();
 
     static {
-        commandTypes.put(commandPattern("(tell|send|message):"), TellIconCommand.class);
-        commandTypes.put(commandPattern("broadcast:"), BroadcastIconCommand.class);
-        commandTypes.put(commandPattern("console:"), ConsoleIconCommand.class);
-        commandTypes.put(commandPattern("player:"), PlayerIconCommand.class);
-        commandTypes.put(commandPattern("server:"), ServerIconCommand.class);
-        commandTypes.put(commandPattern("sound:"), SoundIconCommand.class);
-        commandTypes.put(commandPattern("op:"), OpIconCommand.class);
-        commandTypes.put(commandPattern("open:"), OpenMenuIconCommand.class);
-        commandTypes.put(commandPattern("open-force:"), OpenMenuForceIconCommand.class);
-        commandTypes.put(commandPattern("delay:"), DelayIconCommand.class);
+        commandTypes.put(commandPattern("(tell|send|message):"), IconCommandMessage.class);
+        commandTypes.put(commandPattern("broadcast:"), IconCommandBroadcast.class);
+        commandTypes.put(commandPattern("console:"), IconCommandConsole.class);
+        commandTypes.put(commandPattern("player:"), IconCommandPlayer.class);
+        commandTypes.put(commandPattern("server:"), IconCommandServer.class);
+        commandTypes.put(commandPattern("sound:"), IconCommandSound.class);
+        commandTypes.put(commandPattern("sound-broadcast:"), IconCommnadSoundBroadcast.class);
+        commandTypes.put(commandPattern("op:"), IconCommandOp.class);
+        commandTypes.put(commandPattern("open:"), IconCommandOpen.class);
+        commandTypes.put(commandPattern("open-force:"), IconCommandOpenForce.class);
+        commandTypes.put(commandPattern("delay:"), IconCommandDelay.class);
+        commandTypes.put(commandPattern("take-money:"), IconCommandTakeMoney.class);
+        commandTypes.put(commandPattern("give-money:"), IconCommandGiveMoney.class);
+        commandTypes.put(commandPattern("take-points:"), IconCommandTakePoints.class);
+        commandTypes.put(commandPattern("give-points:"), IconCommandGivePoints.class);
     }
 
     public static List<AbstractIconCommand> readCommands(String input) {
@@ -39,7 +44,10 @@ public class IconCommandSerializer {
 
     public static AbstractIconCommand matchCommand(String input) {
         if (input.equalsIgnoreCase("close")) {
-            return new CloseMenuIconCommand(null);
+            return new IconCommandClose(IconCommandClose.CloseType.CLOSE);
+        }
+        else if (input.equalsIgnoreCase("previous")) {
+            return new IconCommandClose(IconCommandClose.CloseType.PREVIOUS);
         }
         for (Map.Entry<Pattern, Class<? extends AbstractIconCommand>> entry : commandTypes.entrySet()) {
             Matcher matcher = entry.getKey().matcher(input);
@@ -50,7 +58,7 @@ public class IconCommandSerializer {
                 }
             }
         }
-        return new PlayerIconCommand(input);
+        return new IconCommandPlayer(input);
     }
 
     public static List<IconCommand> formatCommands(Object commandOrigin) {

@@ -91,6 +91,6 @@ public class TLogger {
     }
 
     public static TLogger getUnformatted(Plugin plugin) {
-        return new TLogger("§8[§3§l{0}§8][§r{1}§8] §f{2}", plugin, 2);
+        return new TLogger("§8[§3§l{0}§8][§r{1}§8] §f{2}", plugin, 0);
     }
 }

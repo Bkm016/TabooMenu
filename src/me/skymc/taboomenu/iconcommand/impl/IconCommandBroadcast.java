@@ -2,27 +2,29 @@ package me.skymc.taboomenu.iconcommand.impl;
 
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import me.skymc.taboomenu.util.TranslateUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.text.MessageFormat;
 
 /**
  * @Author sky
- * @Since 2018-06-05 20:11
+ * @Since 2018-06-05 20:20
  */
-public class TellIconCommand extends AbstractIconCommand {
+public class IconCommandBroadcast extends AbstractIconCommand {
 
-    public TellIconCommand(String command) {
+
+    public IconCommandBroadcast(String command) {
         super(command);
     }
 
     @Override
     public void execute(Player player) {
-        player.sendMessage(TranslateUtils.format(player, command));
+        Bukkit.broadcastMessage(TranslateUtils.format(player, command));
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format("TellIconCommand'{'command=''{0}'''}'", command);
+        return MessageFormat.format("IconCommandBroadcast'{'command=''{0}'''}'", command);
     }
 }

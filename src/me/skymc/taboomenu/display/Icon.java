@@ -9,7 +9,7 @@ import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.iconcommand.IconCommand;
-import me.skymc.taboomenu.iconcommand.impl.DelayIconCommand;
+import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
 import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
 import me.skymc.taboomenu.util.AttributeUtils;
@@ -161,8 +161,8 @@ public class Icon implements Cloneable {
     public void executeCommand(Player player, List<IconCommand> iconCommands) {
         int delay = 0;
         for (IconCommand iconCommand : iconCommands) {
-            if (iconCommand.getCommand() instanceof DelayIconCommand) {
-                delay += ((DelayIconCommand) iconCommand.getCommand()).getDelay();
+            if (iconCommand.getCommand() instanceof IconCommandDelay) {
+                delay += ((IconCommandDelay) iconCommand.getCommand()).getDelay();
             } else {
                 Bukkit.getScheduler().runTaskLater(TabooMenu.getInst(), () -> iconCommand.getCommand().execute(player), delay);
             }

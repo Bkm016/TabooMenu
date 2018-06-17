@@ -22,6 +22,11 @@ public enum MenuSettings {
     COMMAND("COMMAND"),
 
     /**
+     * 上级菜单
+     */
+    PREVIOUS("PREVIOUS"),
+
+    /**
      * 自动刷新
      */
     AUTO_REFRESH("AUTO-REFRESH"),

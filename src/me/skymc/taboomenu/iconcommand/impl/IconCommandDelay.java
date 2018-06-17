@@ -7,11 +7,11 @@ import org.bukkit.entity.Player;
  * @Author sky
  * @Since 2018-06-08 18:39
  */
-public class DelayIconCommand extends AbstractIconCommand {
+public class IconCommandDelay extends AbstractIconCommand {
 
     private int delay;
 
-    public DelayIconCommand(String command) {
+    public IconCommandDelay(String command) {
         super(command);
         try {
             delay = Integer.valueOf(command);

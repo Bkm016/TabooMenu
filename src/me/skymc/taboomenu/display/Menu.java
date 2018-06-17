@@ -4,11 +4,11 @@ import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.event.IconViewEvent;
 import me.skymc.taboomenu.event.MenuOpenEvent;
+import me.skymc.taboomenu.handler.PlayerDataHandler;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.util.TranslateUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -36,6 +36,7 @@ public class Menu {
     private int rows;
     private int autoRefresh;
     private boolean permissionBypass;
+    private String previous;
     private List<String> openCommand = new ArrayList<>();
     private List<AbstractIconCommand> openAction = new ArrayList<>();
 
@@ -46,9 +47,7 @@ public class Menu {
     }
 
     public void open(Player player) {
-        MenuOpenEvent event = new MenuOpenEvent(player, this);
-        Bukkit.getPluginManager().callEvent(event);
-        event.getMenu().openSilent(player);
+        new MenuOpenEvent(player, this).call().getMenu().openSilent(player);
     }
 
     public void openSilent(Player player) {
@@ -56,32 +55,15 @@ public class Menu {
             if (!openAction.isEmpty()) {
                 openAction.forEach(openAction -> openAction.execute(player));
             }
+
             Inventory inventory = Bukkit.createInventory(new MenuHolder(this), rows * 9, TranslateUtils.colored(name));
             setIcon(player, inventory);
+
+            PlayerDataHandler.ignoredPrevious(player);
             player.openInventory(inventory);
         } catch (Exception e) {
-            player.sendMessage("§cAn internal error occurred while opening the menu.");
-            player.sendMessage(e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    public void refresh(Player player, Inventory inventory) {
-        long time = System.currentTimeMillis();
-        for (Map.Entry<Integer, Icon> entry : icons.entrySet()) {
-            if (entry.getValue() == null || !entry.getValue().canViewIcon(player)) {
-                inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
-            } else {
-                IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
-                Bukkit.getPluginManager().callEvent(event);
-                if (!event.isCancelled()) {
-                    inventory.setItem(entry.getKey(), entry.getValue().getEffectiveIcon(player, ClickType.VIEW).createItemStack(player));
-                }
-            }
-        }
-        time = System.currentTimeMillis() - time;
-        if (player.isOp() && player.getItemInHand().getType().equals(Material.COMMAND)) {
-            player.sendMessage("§7[TabooMenu] §8Performance Mirror: §fThe calculation time of this menu items: " + time + "ms");
+            player.sendMessage("§cAn internal error occurred while opening the menu:");
+            player.sendMessage("§c" + e.toString());
         }
     }
 
@@ -101,6 +83,25 @@ public class Menu {
                     }
                 }
             }.runTaskTimerAsynchronously(TabooMenu.getInst(), autoRefresh * 20, autoRefresh * 20));
+        }
+    }
+
+    public void refresh(Player player, Inventory inventory) {
+        long time = System.currentTimeMillis();
+        for (Map.Entry<Integer, Icon> entry : icons.entrySet()) {
+            if (entry.getValue() == null || !entry.getValue().canViewIcon(player)) {
+                inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
+            } else {
+                IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
+                Bukkit.getPluginManager().callEvent(event);
+                if (!event.isCancelled()) {
+                    inventory.setItem(entry.getKey(), entry.getValue().getEffectiveIcon(player, ClickType.VIEW).createItemStack(player));
+                }
+            }
+        }
+        time = System.currentTimeMillis() - time;
+        if (player.isOp() && player.getItemInHand().getType().equals(Material.COMMAND)) {
+            player.sendMessage("§7[TabooMenu] §8Performance Mirror: §fThe calculation time of this menu items: " + time + "ms");
         }
     }
 
@@ -180,6 +181,14 @@ public class Menu {
 
     public List<String> getOpenCommand() {
         return openCommand;
+    }
+
+    public String getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(String previous) {
+        this.previous = previous;
     }
 
     public String getPermission() {

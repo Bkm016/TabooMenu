@@ -55,6 +55,7 @@ public class MenuSerializer {
             Map settingsMap = ((MemorySection) settingsSection).getValues(false);
             menu.setName(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.NAME.getText(), ""));
             menu.setRows(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.ROWS.getText(), 1));
+            menu.setPrevious(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
             menu.setAutoRefresh(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
             menu.setPermissionBypass(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
             Arrays.stream(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));

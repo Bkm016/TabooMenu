@@ -23,7 +23,8 @@ public class TabooMenuAPI {
      * @return {@link MenuState}
      */
     public static MenuState openMenu(Player player, String menuName, boolean force) {
-        Menu menu = TabooMenu.getMenus().stream().filter(x -> x.getFile().getName().equalsIgnoreCase(menuName)).findFirst().orElse(null);
+        String finalMenuName = menuName.endsWith(".yml") ? menuName : menuName + ".yml";
+        Menu menu = TabooMenu.getMenus().stream().filter(x -> x.getFile().getName().equalsIgnoreCase(finalMenuName)).findFirst().orElse(null);
         if (menu != null) {
             if (force || menu.isPermissionBypass() || player.hasPermission(menu.getPermission())) {
                 try {

@@ -1,6 +1,7 @@
 package me.skymc.taboomenu.event;
 
 import me.skymc.taboomenu.display.Menu;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
@@ -17,6 +18,11 @@ public class MenuOpenEvent extends PlayerEvent {
     public MenuOpenEvent(Player who, Menu menu) {
         super(who);
         this.menu = menu;
+    }
+
+    public MenuOpenEvent call() {
+        Bukkit.getPluginManager().callEvent(this);
+        return this;
     }
 
     @Override

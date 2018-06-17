@@ -10,9 +10,9 @@ import java.text.MessageFormat;
  * @Author sky
  * @Since 2018-06-05 20:20
  */
-public class OpIconCommand extends AbstractIconCommand {
+public class IconCommandOp extends AbstractIconCommand {
 
-    public OpIconCommand(String command) {
+    public IconCommandOp(String command) {
         super(command);
     }
 
@@ -26,6 +26,6 @@ public class OpIconCommand extends AbstractIconCommand {
 
     @Override
     public String toString() {
-        return MessageFormat.format("OpIconCommand'{'command=''{0}'''}'", command);
+        return MessageFormat.format("IconCommandOp'{'command=''{0}'''}'", command);
     }
 }

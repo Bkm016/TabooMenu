@@ -123,7 +123,7 @@ public class IconSerializer {
         if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_ENCHANTMENT.getText())) {
             icon.setShiny(true);
         }
-        icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), ""));
+        icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText(), ""));
     }
 
     private static void loadRequiredItems(Map<String, Object> map, Icon icon) {
