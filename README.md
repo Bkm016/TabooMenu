@@ -327,7 +327,7 @@ Aliases:
   color: 255,255,0
 ```
 
-用于给 `leader helmet` `leader chesplate` `leader leggings` `leader boots` 材质赋予自定义颜色。
+用于给 `leather helmet` `leather chesplate` `leather leggings` `leather boots` 材质赋予自定义颜色。
 
 #### 旗帜图案
 
@@ -732,16 +732,12 @@ TabooMenuAPI.getMenus()
 
 TabooMenu 提供了以上 3 种可供直接调用的方法，用于打开菜单和获取菜单。
 
-```java
-// 菜单已打开
-OPENED
-// 权限不足
-NO_PERMISSION
-// 菜单不存在
-NOT_FOUND_MENU
-// 其他错误
-UNKNOWN
-```
+| 枚举 | 意义 |
+| --- | --- |
+| OPENED | 菜单已打开 |
+| NO_PERMISSION | 没有权限打开菜单 |
+| NOT_FOUND_MENU | 菜单不存在 |
+| UNKNOWN | 未知错误 |
 
 openMenu 方法会返回 `MenuState` 枚举类，来判断方法的执行结果。
 
