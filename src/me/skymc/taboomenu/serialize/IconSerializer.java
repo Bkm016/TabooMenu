@@ -137,9 +137,9 @@ public class IconSerializer {
 
     private static void loadSlotCopy(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
         Object slotObject = map.entrySet().stream().filter(entry -> IconSettings.SLOT_COPY.getText().equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().get().getValue();
-        for (String slotString : slotObject instanceof List ? (List<String>) slotObject : Collections.singletonList(slotObject.toString())) {
+        for (Object slotString : slotObject instanceof List ? (List) slotObject : Collections.singletonList(slotObject.toString())) {
             try {
-                icon.getSlotCopy().add(Integer.valueOf(slotString));
+                icon.getSlotCopy().add(Integer.valueOf(slotString.toString()));
             } catch (Exception e) {
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid SLOT-COPY: " + e.toString());
             }
