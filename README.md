@@ -56,7 +56,7 @@
 + 强过 DeluxeMenu 无数倍的条件表达式写法。
 + 物品 ID 容错。
 + 7 种命令触发方式。
-+ 11 种命令执行方式。
++ 17 种命令执行方式。
 + PlaceholderAPI 支持。
 + 更智能的界面刷新方式。
 + 更智能的命令系统。
@@ -126,6 +126,8 @@ menu-settings:
   open-action: 'sound: BLOCK_CHEST_OPEN-1-1'
   # 菜单打开是否跳过权限判断
   permission-bypass: false
+  # 当前菜单关闭时自动打开以下菜单
+  previous: 'example2.yml'
 ```
 
 ---
@@ -325,7 +327,7 @@ Aliases:
   color: 255,255,0
 ```
 
-用于给 `leader helmet` `leader chesplate` `leader leggings` `leader boots` 材质赋予自定义颜色。
+用于给 `leather helmet` `leather chesplate` `leather leggings` `leather boots` 材质赋予自定义颜色。
 
 #### 旗帜图案
 
@@ -432,18 +434,14 @@ required-item:
 > 但是物品不能同时包含 "水晶" 和 "节点"，否则将会出现误差，导致物品扣除出错。
 > 所以请在判断时使用精确的条件。
 
-可用条件：
+可用物品条件：
 
-```yaml
-# 物品材质
-material
-# 物品名称
-name
-# 物品描述
-lore
-# 物品数量
-amount
-```
+|  名称  |  作用  |  示范  |
+| --- | --- | --- |
+| material | 材质 | material:stone |
+| name | 名称 | name:§5Epic Diamond |
+| lore | 描述 | lore:§eLegend |
+| amount | 数量 | amount:1 |
 
 名称和描述的判断方式均为含颜色的关键字判断。  
 懂代码的给你们上一段代码你们就懂了，这我也解释不清除，看不明白的多尝试就行了。
@@ -477,45 +475,21 @@ amount
     list: 'op: gamemode 0'
 ```
 
-通过 `type` 节点可以判断点击类型，多个类型可以用 "|" 符号区分如：`LEFT|RIGHT`
-
 > 子节点 `list` 与 `command` 意义相同。
 
+通过 `type` 节点可以判断点击类型，多个类型可以用 "|" 符号区分如：`LEFT|RIGHT`  
 可用点击类型:
 
-```yaml
-# 左键
-LEFT
-# 右键
-RIGYT
-# 潜行左键
-SHIFT_LEFT
-# 潜行右键
-SHIFT_RIGHT
-# 鼠标中键
-MIDDLE
-# 丢弃
-DROP
-# 全部丢弃
-CONTROL_DROP
-# 全部
-ALL
-```
-
-一拳一个 dm 怪，按在地上锤。
-
-```yaml
-# DeluxeMenu 格式
-items:
-  a:
-    slot: 0
-    name: '左键生存，右键创造'
-    material: diamond
-    left_click_commands:
-    - '[player] gamemode 1'
-    right_click_commands:
-    - '[player] gamemode 0'
-```
+|  类型  |  作用  |
+| --- | --- |
+| LEFT | 鼠标左键点击 |
+| RIGHT | 鼠标右键点击 |
+| SHIFT_LEFT | 潜行 + 鼠标左键点击 |
+| SHIFT_RIGHT | 潜行 + 鼠标右键点击 |
+| MIDDLE | 鼠标中键 |
+| DROP | 丢弃 |
+| CONTROL_DROP | 全部丢弃|
+| ALL | 全部 |
 
 与 ChestCommands 相同，你可以在单行写多条指令用 ";" 符号区分。也可以写成多行：
 
@@ -537,7 +511,7 @@ items:
     - 'give %player_name% iron'
 ```
 
-与 ChestCommands 相同，你可以在指令中使用某些字符，来改变执行方式。
+与 ChestCommands 相同，你可以在指令中使用某些标记字符，来改变执行方式。
 
 
 ```yaml
@@ -546,43 +520,31 @@ items:
   command: 'tell: 点击提示'
 ```
 
-可用执行方式:
+可用指令执行方式:
 
-```yaml
-# 发送信息
-tell, send, message
-# 发送公告
-broadcast
-# 执行管理员命令
-op
-# 执行后台命令
-console
-# 执行玩家命令
-player 或 省略
-# 传送服务器（需要 BungeeCord）
-server
-# 播放音效
-sound
-# 打开菜单
-open
-# 打开菜单（跳过权限判断）
-open-force
-# 延迟执行（单位：ticks）
-delay
-```
-
-以下几种特殊方式需要注意使用规范，其他类型按照正常格式执行：
-
-```yaml
-# 播放音效
-command: 'sound: BLOCK_ANVIL_USE-1-1'
-# 打开菜单
-command: 'open: example.yml'
-# 延迟执行（仅允许整数）
-command: 'delay: 20'
-```
-
-指令执行过成为从上到下，在中间添加 `delay` 类型则会延迟执行接下来的动作。
+|  命令  |  作用  |  示范  |
+| --- | --- | --- |
+| tell: TEXT | 发送信息 | tell: send a message |
+| send: TEXT | 发送信息 | send: send a message | 
+| message: TEXT | 发送信息 | message: send a message |
+| broadcast: TEXT | 发送公告 | broadcast: send a broadcast |
+| op: COMMAND | 执行管理员命令 | op: gamemode 1 |
+| console: COMMAND | 执行控制台命令 | console: gamemode 1 {player} |
+| player: COMMAND | 执行玩家命令 | player: spawn |
+| server: TEXT | 传送到服务器 | server: lobby |
+| sound: SOUND-VOLUME-PITCH | 播放音效 | sound: BLOCK_ANVIL_USE-1-1 |
+| sound-broadcast: SOOND-VOLUME-PITCH | 播放全服音效 | sound-broadcast: BLOCK_ANVIL_USE-1-1 |
+| open: TEXT | 打开菜单 | open: example.yml |
+| open-force: TEXT | 打开菜单（跳过权限判断）| open-force: example.yml |
+| delay: INT | 延迟执行 | delay: 20 |
+| give-money: DOUBLE | 给予金币 | give-money: 10.5 |
+| take-moeny: DOUBLE | 扣除金币 | take-money: 10.5 |
+| give-points: INT | 给予点券 | give-points: 20 |
+| take-points: INT | 扣除点券 | take-points: 20 |
+| close | 关闭菜单 | close |
+| previous | 返回上级菜单 | previous |
+ 
+指令执行顺序为从上到下，在中间添加 `delay` 类型则会延迟执行接下来的动作。
 
 ```yaml
 0:
@@ -770,16 +732,12 @@ TabooMenuAPI.getMenus()
 
 TabooMenu 提供了以上 3 种可供直接调用的方法，用于打开菜单和获取菜单。
 
-```java
-// 菜单已打开
-OPENED
-// 权限不足
-NO_PERMISSION
-// 菜单不存在
-NOT_FOUND_MENU
-// 其他错误
-UNKNOWN
-```
+| 枚举 | 意义 |
+| --- | --- |
+| OPENED | 菜单已打开 |
+| NO_PERMISSION | 没有权限打开菜单 |
+| NOT_FOUND_MENU | 菜单不存在 |
+| UNKNOWN | 未知错误 |
 
 openMenu 方法会返回 `MenuState` 枚举类，来判断方法的执行结果。
 
