@@ -19,6 +19,7 @@
   + [名称及描述](#名称及描述)
   + [损伤值](#损伤值)
   + [物品克隆](#物品克隆)
+  + [物品填充](#物品填充)
   + [附魔效果](#附魔效果)
   + [属性隐藏](#属性隐藏)
   + [头颅皮肤](#头颅皮肤)
@@ -29,6 +30,7 @@
   + [所需物品](#所需物品)
   + [物品动作](#物品动作)
   + [物品条件](#物品条件)
+  + [特殊动作](#特殊动作)
 + [开发者工具](#开发者工具)
   + [事件](#事件)
   + [方法](#方法)
@@ -281,6 +283,16 @@ Aliases:
 用于将该物品克隆到其他位置，各项节点相同。  
 似乎 DeluxeMenu 也有这个功能？
 
+#### 物品填充
+
+```yaml
+0: 
+  id: diamond
+  full: true
+```
+
+用于将该物品填充到菜单的空白位置，每个菜单仅允许出现一个填充节点（多余无效）。
+
 #### 附魔效果
 
 
@@ -442,6 +454,7 @@ required-item:
 | name | 名称 | name:§5Epic Diamond |
 | lore | 描述 | lore:§eLegend |
 | amount | 数量 | amount:1 |
+| damage | 损伤值 | damage:1 |
 
 名称和描述的判断方式均为含颜色的关键字判断。  
 懂代码的给你们上一段代码你们就懂了，这我也解释不清除，看不明白的多尝试就行了。
@@ -557,8 +570,6 @@ required-item:
 
 #### 物品条件
 
-你可以使用 `requirement` 节点来添加自定义条件表达式：
-
 ```yaml
 0:
   id: diamond
@@ -568,25 +579,14 @@ required-item:
       id: barrier
 ```
 
+你可以使用 `requirement` 节点来添加自定义条件表达式。  
 节点 `expression` 为表达式文本，并且添加了以下可用参数：
 
-玩家对象:
-
-```JavaScript
-player.getLevel() > 100
-```
-
-服务器对象:
-
-```JavaScript
-bukkit.getOnlinePlayers().size() > 10
-```
-
-点击方式文本:
-
-```JavaScript
-clickType == "RIGHT"
-```
+| 参数名称 | 作用 | 示范 |
+| --- | --- | --- |
+| player | 玩家对象 | player.getLevel() > 100 |
+| bukkit | 服务器对象 | bukkit.getOnlinePlayers().size() > 10 |
+| clickType | 点击方式文本 | clickType == "RIGHT" |
 
 这里有一点需要注意，当玩家查看物品或是点击物品时都会执行表达式。但是在玩家查看物品时，`clickType` 则为 `VIEW`。所以在判断点击方式时，应该使用以下写法：
 
@@ -681,7 +681,48 @@ expression: 'clickType == "VIEW" || clickType == "RIGHT"'
     precompile: false
 ```
 
->  如果启用预编译，则无法使用 `PlaceholderAPI` 变量
+注意！如果启用预编译，则无法使用 `PlaceholderAPI` 变量
+
+#### 特殊动作
+
+```yaml
+0:
+  id: command
+  name: 'Example Action!'
+  action:
+    view-precompile: true
+    view: |-
+        viewItem.setAmount(10);
+```
+
+是否局限于 `command` 的那些基础功能？或是有一些编程基础？  
+特殊动作节点 `action` 允许物品在 `查看` 或是 `点击` 后执行脚本。
+
+| 节点名称 | 作用 | 示范 |
+| --- | --- | --- |
+| view-precompile | 查看后的动作是否预编译 | view-precompile: true |
+| view | 查看后的动作 | view: 'player.sendMessage("view success!")' |
+| click-precompile | 点击后的动作是否预编译 | click-precompile: true |
+| click | 点击后的动作 | click: 'player.sendTitle("Click success!", "", 10, 10, 10)' |
+
+> 无论是查看还是点击动作，都仅在点击条件或查看条件符合才会执行。  
+
+查看动作可用参数：
+
+| 参数名称 | 作用 | 示范 |
+| --- | --- | --- |
+| player | 玩家对象 | player.setLevel(10) |
+| bukkit | 服务器对象 | bukkit.broadcastMessage("broadcast!") |
+| viewItem | 物品对象 | viewItem.setAmount(1) |
+
+点击动作可用参数：
+
+| 参数名称 | 作用 | 示范 |
+| --- | --- | --- |
+| player | 玩家对象 | player.setLevel(10) |
+| bukkit | 服务器对象 | bukkit.broadcastMessage("broadcast!") |
+| clickEvent | 点击事件 | clickEvent.getInventory().setItem(clickEvent.getRawSlot(), null) |
+| clickType | 点击方式文本 | clickType == "RIGHT" |
 
 ---
 ### 开发者工具
