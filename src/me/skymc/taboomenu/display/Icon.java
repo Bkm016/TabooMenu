@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.display.data.ClickType;
+import me.skymc.taboomenu.display.data.IconAction;
 import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.event.IconClickEvent;
@@ -19,6 +20,8 @@ import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -27,7 +30,10 @@ import org.bukkit.inventory.meta.SkullMeta;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -55,8 +61,11 @@ public class Icon implements Cloneable {
     private String permissionMessage;
     private String permissionView;
 
+    private boolean full;
     private boolean shiny;
     private boolean hideAttribute;
+
+    private IconAction iconAction;
 
     private Set<Integer> slotCopy = new HashSet<>();
     private List<Requirement> requirements = new ArrayList<>();
@@ -69,7 +78,7 @@ public class Icon implements Cloneable {
         this.amount = amount;
     }
 
-    public void onClick(Player player, ClickType clickType) {
+    public void onClick(Player player, InventoryClickEvent clickEvent, ClickType clickType) {
         Icon icon = getEffectiveIcon(player, clickType);
 
         IconClickEvent event = new IconClickEvent(player, TabooMenuAPI.getPlayerCurrentMenu(player), this);
@@ -156,6 +165,15 @@ public class Icon implements Cloneable {
         }
 
         executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
+        executeClickAction(player, clickEvent, clickType, icon);
+    }
+
+    public boolean canClickIcon(Player player) {
+        return StringUtils.isBlank(permission) || (permission.startsWith("-") ? !player.hasPermission(permission.substring(1)) : player.hasPermission(permission));
+    }
+
+    public boolean canViewIcon(Player player) {
+        return StringUtils.isBlank(permissionView) || (permissionView.startsWith("-") ? !player.hasPermission(permissionView.substring(1)) : player.hasPermission(permissionView));
     }
 
     public void executeCommand(Player player, List<IconCommand> iconCommands) {
@@ -169,12 +187,34 @@ public class Icon implements Cloneable {
         }
     }
 
-    public boolean canClickIcon(Player player) {
-        return StringUtils.isBlank(permission) || (permission.startsWith("-") ? !player.hasPermission(permission.substring(1)) : player.hasPermission(permission));
+    public void executeClickAction(Player player, InventoryClickEvent clickEvent, ClickType clickType, Icon icon) {
+        if (icon.getIconAction() != null && icon.getIconAction().getClickAction() != null) {
+            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name(), "clickEvent", clickEvent));
+            try {
+                if (icon.getIconAction().isClickPrecompile()) {
+                    icon.getIconAction().getClickActionScript().eval(bindings);
+                } else {
+                    JavaScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getClickAction())).eval(bindings);
+                }
+            } catch (Exception e) {
+                TabooMenu.getTLogger().error("Action-Click javascript is invalid: " + e.toString());
+            }
+        }
     }
 
-    public boolean canViewIcon(Player player) {
-        return StringUtils.isBlank(permissionView) || (permissionView.startsWith("-") ? !player.hasPermission(permissionView.substring(1)) : player.hasPermission(permissionView));
+    public void executeViewAction(Player player, ItemStack itemStack, Icon icon) {
+        if (icon.getIconAction() != null && icon.getIconAction().getViewAction() != null) {
+            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "viewItem", itemStack));
+            try {
+                if (icon.getIconAction().isViewPrecompile()) {
+                    icon.getIconAction().getViewActionScript().eval(bindings);
+                } else {
+                    JavaScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getViewAction())).eval(bindings);
+                }
+            } catch (Exception e) {
+                TabooMenu.getTLogger().error("Action-View javascript is invalid: " + e.toString());
+            }
+        }
     }
 
     public Icon getEffectiveIcon(Player player, ClickType clickType) {
@@ -277,24 +317,28 @@ public class Icon implements Cloneable {
                 Double.compare(icon.getPrice(), getPrice()) == 0 &&
                 getPoints() == icon.getPoints() &&
                 getLevels() == icon.getLevels() &&
+                isFull() == icon.isFull() &&
                 isShiny() == icon.isShiny() &&
                 isHideAttribute() == icon.isHideAttribute() &&
                 getMaterial() == icon.getMaterial() &&
-                Objects.equals(getName(), icon.getName()) &&
-                Objects.equals(getLore(), icon.getLore()) &&
-                Objects.equals(getColor(), icon.getColor()) &&
-                Objects.equals(getSkullOwner(), icon.getSkullOwner()) &&
-                Objects.equals(getPermission(), icon.getPermission()) &&
-                Objects.equals(getPermissionMessage(), icon.getPermissionMessage()) &&
-                Objects.equals(getPermissionView(), icon.getPermissionView()) &&
-                Objects.equals(getSlotCopy(), icon.getSlotCopy()) &&
-                Objects.equals(getRequirements(), icon.getRequirements()) &&
-                Objects.equals(getIconCommands(), icon.getIconCommands());
+                java.util.Objects.equals(getName(), icon.getName()) &&
+                java.util.Objects.equals(getLore(), icon.getLore()) &&
+                java.util.Objects.equals(getBannerPatterns(), icon.getBannerPatterns()) &&
+                java.util.Objects.equals(getColor(), icon.getColor()) &&
+                java.util.Objects.equals(getSkullOwner(), icon.getSkullOwner()) &&
+                java.util.Objects.equals(getPermission(), icon.getPermission()) &&
+                java.util.Objects.equals(getPermissionMessage(), icon.getPermissionMessage()) &&
+                java.util.Objects.equals(getPermissionView(), icon.getPermissionView()) &&
+                java.util.Objects.equals(getIconAction(), icon.getIconAction()) &&
+                java.util.Objects.equals(getSlotCopy(), icon.getSlotCopy()) &&
+                java.util.Objects.equals(getRequirements(), icon.getRequirements()) &&
+                java.util.Objects.equals(getIconCommands(), icon.getIconCommands()) &&
+                java.util.Objects.equals(getRequiredItems(), icon.getRequiredItems());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getColor(), getSkullOwner(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isShiny(), isHideAttribute(), getSlotCopy(), getRequirements(), getIconCommands());
+        return java.util.Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems());
     }
 
     // *********************************
@@ -342,6 +386,14 @@ public class Icon implements Cloneable {
 
     public void setLore(List<String> lore) {
         this.lore = lore;
+    }
+
+    public List<String> getBannerPatterns() {
+        return bannerPatterns;
+    }
+
+    public void setBannerPatterns(List<String> bannerPatterns) {
+        this.bannerPatterns = bannerPatterns;
     }
 
     public Color getColor() {
@@ -424,31 +476,51 @@ public class Icon implements Cloneable {
         this.hideAttribute = hideAttribute;
     }
 
+    public boolean isFull() {
+        return full;
+    }
+
+    public void setFull(boolean full) {
+        this.full = full;
+    }
+
+    public IconAction getIconAction() {
+        return iconAction;
+    }
+
+    public void setIconAction(IconAction iconAction) {
+        this.iconAction = iconAction;
+    }
+
     public Set<Integer> getSlotCopy() {
         return slotCopy;
+    }
+
+    public void setSlotCopy(Set<Integer> slotCopy) {
+        this.slotCopy = slotCopy;
     }
 
     public List<Requirement> getRequirements() {
         return requirements;
     }
 
-    public List<IconCommand> getIconCommands() {
-        return iconCommands;
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
     }
 
-    public List<RequiredItem> getRequiredItems() {
-        return requiredItems;
+    public List<IconCommand> getIconCommands() {
+        return iconCommands;
     }
 
     public void setIconCommands(List<IconCommand> iconCommands) {
         this.iconCommands = iconCommands;
     }
 
-    public List<String> getBannerPatterns() {
-        return bannerPatterns;
+    public List<RequiredItem> getRequiredItems() {
+        return requiredItems;
     }
 
-    public void setBannerPatterns(List<String> bannerPatterns) {
-        this.bannerPatterns = bannerPatterns;
+    public void setRequiredItems(List<RequiredItem> requiredItems) {
+        this.requiredItems = requiredItems;
     }
 }

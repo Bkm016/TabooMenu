@@ -3,14 +3,17 @@ package me.skymc.taboomenu.serialize;
 import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.display.Icon;
+import me.skymc.taboomenu.display.data.IconAction;
 import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
+import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,17 +97,22 @@ public class IconSerializer {
             loadRequiredItems(map, icon);
         }
 
+        if (MapUtils.containsIgnoreCase(map, IconSettings.ACTION.getText())) {
+            loadIconAction(map, iconName, fileName, errors, icon);
+        }
+
         if (!icon.getRequirements().isEmpty()) {
             icon.getRequirements().sort(Comparator.comparingInt(Requirement::getPriority));
         }
 
         icon.setShiny(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SHINY.getText(), false));
-        icon.setHideAttribute(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
         icon.setColor(parseColor(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
         icon.setSkullOwner(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SKULL_OWNER.getText(), ""));
         icon.setPermission(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION.getText(), ""));
         icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_VIEW.getText(), ""));
         icon.setPermissionMessage(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
+        icon.setHideAttribute(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
+        icon.setFull(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.FULL.getText(), false));
 
         loadDeprecatedSettings(map, icon);
         return icon;
@@ -235,6 +243,37 @@ public class IconSerializer {
             } else {
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: " + requirementOrigin);
             }
+        }
+    }
+
+    private static void loadIconAction(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
+        Object actionObject = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ACTION.getText(), new Object());
+        if (actionObject instanceof ConfigurationSection) {
+            IconAction iconAction = new IconAction();
+            try {
+                Map<String, Object> actionMap = ((ConfigurationSection) actionObject).getValues(false);
+                if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText())) {
+                    String expression = MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText(), "");
+                    iconAction.setViewAction(expression);
+                    iconAction.setViewPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
+                    if (iconAction.isViewPrecompile()) {
+                        iconAction.setViewActionScript(JavaScriptHandler.compile(expression));
+                    }
+                }
+                if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_CLICK.getText())) {
+                    String expression = MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_CLICK.getText(), "");
+                    iconAction.setClickAction(expression);
+                    iconAction.setClickPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
+                    if (iconAction.isClickPrecompile()) {
+                        iconAction.setClickActionScript(JavaScriptHandler.compile(expression));
+                    }
+                }
+            } catch (Exception e) {
+                errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: " + e.toString());
+            }
+            icon.setIconAction(iconAction);
+        } else {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: not a ConfigurationSection");
         }
     }
 }

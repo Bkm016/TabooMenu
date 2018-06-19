@@ -55,10 +55,8 @@ public class Menu {
             if (!openAction.isEmpty()) {
                 openAction.forEach(openAction -> openAction.execute(player));
             }
-
             Inventory inventory = Bukkit.createInventory(new MenuHolder(this), rows * 9, TranslateUtils.colored(name));
             setIcon(player, inventory);
-
             PlayerDataHandler.ignoredPrevious(player);
             player.openInventory(inventory);
         } catch (Exception e) {
@@ -70,10 +68,8 @@ public class Menu {
     public void setIcon(Player player, Inventory inventory) {
         refresh(player, inventory);
         if (autoRefresh > 0) {
-            if (refreshTasks.containsKey(player.getName())) {
-                refreshTasks.get(player.getName()).cancel();
-            }
-            refreshTasks.put(player.getName(), new BukkitRunnable() {
+            Optional.ofNullable(refreshTasks.put(player.getName(), new BukkitRunnable() {
+
                 @Override
                 public void run() {
                     if (player.getOpenInventory().getTopInventory().equals(inventory)) {
@@ -82,7 +78,7 @@ public class Menu {
                         cancel();
                     }
                 }
-            }.runTaskTimerAsynchronously(TabooMenu.getInst(), autoRefresh * 20, autoRefresh * 20));
+            }.runTaskTimerAsynchronously(TabooMenu.getInst(), autoRefresh * 20, autoRefresh * 20))).ifPresent(BukkitTask::cancel);
         }
     }
 
@@ -95,7 +91,10 @@ public class Menu {
                 IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
                 Bukkit.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
-                    inventory.setItem(entry.getKey(), entry.getValue().getEffectiveIcon(player, ClickType.VIEW).createItemStack(player));
+                    Icon icon = entry.getValue().getEffectiveIcon(player, ClickType.VIEW);
+                    ItemStack itemStack = icon.createItemStack(player);
+                    icon.executeViewAction(player, itemStack, icon);
+                    inventory.setItem(entry.getKey(), itemStack);
                 }
             }
         }

@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 /**
  * @Author sky
@@ -45,6 +46,12 @@ public class MenuSerializer {
 
         loadMenuIcons(file, errors, menu, configuration);
         loadMenuSettings(menu, configuration);
+
+        try {
+            menu.getIcons().entrySet().stream().filter(x -> x.getValue().isFull()).findFirst().ifPresent(fullItem -> IntStream.range(0, menu.getRows() * 9).filter(i -> !menu.getIcons().containsKey(i)).forEach(i -> menu.getIcons().put(i, fullItem.getValue())));
+        } catch (Exception e) {
+            errors.add("The " + file.getName() + " has an invalid Full-Icon: " + e.toString());
+        }
         return menu;
     }
 

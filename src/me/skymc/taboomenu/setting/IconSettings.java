@@ -32,6 +32,11 @@ public enum IconSettings {
     COLOR("COLOR"),
 
     /**
+     * 附魔特效
+     */
+    SHINY("SHINY"),
+
+    /**
      * 头颅皮肤
      */
     SKULL_OWNER("SKULL-OWNER"),
@@ -40,6 +45,11 @@ public enum IconSettings {
      * 旗帜图案
      */
     BANNER_PATTERN("BANNER-PATTERN"),
+
+    /**
+     * 隐藏属性
+     */
+    HIDE_ATTRIBUTE("HIDE-ATTRIBUTE"),
 
     /**
      * 触发命令
@@ -67,12 +77,22 @@ public enum IconSettings {
     REQUIRED_ITEM("REQUIRED-ITEM"),
 
     /**
+     * 填充界面
+     */
+    FULL("FULL"),
+
+    /**
+     * 坐标拷贝
+     */
+    SLOT_COPY("SLOT-COPY"),
+
+    /**
      * 点击权限
      */
     PERMISSION("PERMISSION"),
 
     /**
-     * 点击权限提示
+     * 点击权限:提示
      */
     PERMISSION_MESSAGE("PERMISSION-MESSAGE"),
 
@@ -87,39 +107,49 @@ public enum IconSettings {
     REQUIREMENT("REQUIREMENT"),
 
     /**
-     * 条件表达式
+     * 条件表达式:表达式
      */
     REQUIREMENT_EXPRESSION("EXPRESSION"),
 
     /**
-     * 条件表达式是否预编译
+     * 条件表达式:是否预编译
      */
     REQUIREMENT_PRECOMPILE("PRECOMPILE"),
 
     /**
-     * 条件优先级
+     * 条件表达式:优先级
      */
     REQUIREMENT_PRIORITY("PRIORITY"),
 
     /**
-     * 条件展示物品
+     * 条件表达式:物品
      */
     REQUIREMENT_ITEM("ITEM"),
 
     /**
-     * 附魔特效
+     * 特殊动作
      */
-    SHINY("SHINY"),
+    ACTION("ACTION"),
 
     /**
-     * 坐标拷贝
+     * 特殊动作:查看
      */
-    SLOT_COPY("SLOT-COPY"),
+    ACTION_VIEW("VIEW"),
 
     /**
-     * 隐藏属性
+     * 特殊动作:是否预编译查看表达式
      */
-    HIDE_ATTRIBUTE("HIDE-ATTRIBUTE"),
+    ACTION_VIEW_PRECOMPILE("VIEW-PRECOMPILE"),
+
+    /**
+     * 特殊动作:点击
+     */
+    ACTION_CLICK("CLICK"),
+
+    /**
+     * 特殊动作:是否预编译点击表达式
+     */
+    ACTION_CLICK_PRECOMPILE("CLICK-PRECOMPILE"),
 
     /**
      * 用于旧数据导入

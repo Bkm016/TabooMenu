@@ -3,8 +3,10 @@ package me.skymc.taboomenu.display.data;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.NumberConversions;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 
 /**
  * @Author sky
@@ -15,17 +17,19 @@ public class RequiredItem {
     private final String material;
     private final String name;
     private final String lore;
+    private final int damage;
     private final int amount;
 
-    public RequiredItem(String material, String name, String lore, int amount) {
+    public RequiredItem(String material, String name, String lore, int damage, int amount) {
         this.material = material;
         this.name = name;
         this.lore = lore;
+        this.damage = damage;
         this.amount = amount;
     }
 
     public boolean isRequired(ItemStack itemStack) {
-        return (material == null || itemStack.getType().name().equalsIgnoreCase(material)) && (name == null || (itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().getDisplayName().contains(name))) && (lore == null || (itemStack.getItemMeta().hasLore() && itemStack.getItemMeta().getLore().toString().contains(lore)));
+        return (material == null || itemStack.getType().name().equalsIgnoreCase(material)) && (damage == -1 || Integer.valueOf(itemStack.getDurability()).equals(damage)) && (name == null || (itemStack.getItemMeta().hasDisplayName() && itemStack.getItemMeta().getDisplayName().contains(name))) && (lore == null || (itemStack.getItemMeta().hasLore() && itemStack.getItemMeta().getLore().toString().contains(lore)));
     }
 
     public boolean hasItem(Player player) {
@@ -61,16 +65,12 @@ public class RequiredItem {
         }
     }
 
-    @Override
-    public String toString() {
-        return MessageFormat.format("RequiredItem'{'material=''{0}'', name=''{1}'', lore=''{2}'', amount={3}'}'", material, name, lore, amount);
-    }
-
     public static RequiredItem valueOf(String source) {
         String material = null;
         String name = null;
         String lore = null;
         int amount = 1;
+        int damage = -1;
         for (String condition : source.split(",")) {
             String[] data = condition.split(":");
             if (data.length == 2) {
@@ -88,17 +88,44 @@ public class RequiredItem {
                         break;
                     }
                     case "amount": {
-                        try {
-                            amount = Integer.valueOf(data[1]);
-                        } catch (Exception ignored) {
-                        }
+                        amount = NumberConversions.toInt(data[1]);
+                        break;
+                    }
+                    case "damage": {
+                        damage = NumberConversions.toInt(data[1]);
                         break;
                     }
                     default:
                 }
             }
         }
-        return new RequiredItem(material, name, lore, amount);
+        return new RequiredItem(material, name, lore, damage, amount);
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("RequiredItem'{'material=''{0}'', name=''{1}'', lore=''{2}'', damage={3}, amount={4}'}'", material, name, lore, damage, amount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RequiredItem)) {
+            return false;
+        }
+        RequiredItem that = (RequiredItem) o;
+        return damage == that.damage &&
+                getAmount() == that.getAmount() &&
+                Objects.equals(getMaterial(), that.getMaterial()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getLore(), that.getLore());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMaterial(), getName(), getLore(), damage, getAmount());
     }
 
     // *********************************

@@ -47,19 +47,19 @@ public class ListenerInventory implements Listener {
                 }
 
                 if (e.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_RIGHT) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.SHIFT_RIGHT);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.SHIFT_RIGHT);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_LEFT) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.SHIFT_LEFT);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.SHIFT_LEFT);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.CONTROL_DROP) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.CONTROL_DROP);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.CONTROL_DROP);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.RIGHT) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.RIGHT);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.RIGHT);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.LEFT) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.LEFT);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.LEFT);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.DROP) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.DROP);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.DROP);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.MIDDLE) {
-                    icon.onClick((Player) e.getWhoClicked(), ClickType.MIDDLE);
+                    icon.onClick((Player) e.getWhoClicked(), e, ClickType.MIDDLE);
                 }
 
                 menuHolder.getMenu().refresh((Player) e.getWhoClicked(), e.getInventory());
