@@ -242,6 +242,10 @@ public class Icon implements Cloneable {
     }
 
     public ItemStack createItemStack(Player player) {
+        if (material.equals(Material.AIR)) {
+            return new ItemStack(Material.AIR);
+        }
+
         ItemStack itemStack = new ItemStack(material, amount, data);
         ItemMeta itemMeta = itemStack.getItemMeta();
 

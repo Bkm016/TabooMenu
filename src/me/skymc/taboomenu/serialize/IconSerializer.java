@@ -43,11 +43,6 @@ public class IconSerializer {
             getSimilarMaterial(material[0], icon);
         }
 
-        if (icon.getMaterial().equals(Material.AIR)) {
-            icon.setMaterial(Material.BEDROCK);
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: cannot used AIR");
-        }
-
         if (MapUtils.containsIgnoreCase(map, IconSettings.NAME.getText())) {
             icon.setName(TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Name", "&f") + MapUtils.getOrDefaultIgnoreCase(map, IconSettings.NAME.getText(), ""));
         }
