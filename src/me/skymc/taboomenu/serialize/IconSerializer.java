@@ -243,10 +243,10 @@ public class IconSerializer {
 
     private static void loadIconAction(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
         Object actionObject = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ACTION.getText(), new Object());
-        if (actionObject instanceof ConfigurationSection) {
+        if (actionObject instanceof Map) {
             IconAction iconAction = new IconAction();
             try {
-                Map<String, Object> actionMap = ((ConfigurationSection) actionObject).getValues(false);
+                Map<String, Object> actionMap = ((Map) actionObject);
                 if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText())) {
                     String expression = MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText(), "");
                     iconAction.setViewAction(expression);
@@ -268,7 +268,7 @@ public class IconSerializer {
             }
             icon.setIconAction(iconAction);
         } else {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: not a ConfigurationSection");
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: not a Map");
         }
     }
 }
