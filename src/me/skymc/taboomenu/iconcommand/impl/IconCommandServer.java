@@ -1,6 +1,5 @@
 package me.skymc.taboomenu.iconcommand.impl;
 
-import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import me.skymc.taboomenu.util.BungeeUtils;
 import org.bukkit.entity.Player;

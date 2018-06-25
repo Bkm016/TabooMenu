@@ -76,7 +76,6 @@ public class StringUtils {
         if (input == null) {
             return null;
         }
-
         String s = input.toLowerCase();
         int strLen = s.length();
         StringBuilder buffer = new StringBuilder(strLen);
@@ -96,7 +95,7 @@ public class StringUtils {
         return buffer.toString();
     }
 
-    public static double similarDegree(String strA, String strB){
+    public static double similarDegree(String strA, String strB) {
         String newStrA = removeSign(max(strA, strB));
         String newStrB = removeSign(min(strA, strB));
         int temp = Math.max(newStrA.length(), newStrB.length());
@@ -118,7 +117,7 @@ public class StringUtils {
     private static String removeSign(String str) {
         StringBuilder sb = new StringBuilder();
         for (char item : str.toCharArray()) {
-            if (charReg(item)){
+            if (charReg(item)) {
                 sb.append(item);
             }
         }
@@ -126,7 +125,7 @@ public class StringUtils {
     }
 
     private static boolean charReg(char charValue) {
-        return (charValue >= 0x4E00 && charValue <= 0X9FA5) || (charValue >= 'a' && charValue <= 'z') || (charValue >= 'A' && charValue <= 'Z')  || (charValue >= '0' && charValue <= '9');
+        return (charValue >= 0x4E00 && charValue <= 0X9FA5) || (charValue >= 'a' && charValue <= 'z') || (charValue >= 'A' && charValue <= 'Z') || (charValue >= '0' && charValue <= '9');
     }
 
     private static String longestCommonSubstring(String strA, String strB) {
@@ -161,5 +160,74 @@ public class StringUtils {
             }
         }
         return new String(result);
+    }
+
+    public static Boolean toBooleanObject(String str) {
+        if (str.equals("true")) {
+            return Boolean.TRUE;
+        } else if (str == null) {
+            return null;
+        } else {
+            char ch0;
+            char ch1;
+            char ch2;
+            char ch3;
+            switch (str.length()) {
+                case 1:
+                    ch0 = str.charAt(0);
+                    if (ch0 == 'y' || ch0 == 'Y' || ch0 == 't' || ch0 == 'T') {
+                        return Boolean.TRUE;
+                    }
+
+                    if (ch0 != 'n' && ch0 != 'N' && ch0 != 'f' && ch0 != 'F') {
+                        break;
+                    }
+
+                    return Boolean.FALSE;
+                case 2:
+                    ch0 = str.charAt(0);
+                    ch1 = str.charAt(1);
+                    if ((ch0 == 'o' || ch0 == 'O') && (ch1 == 'n' || ch1 == 'N')) {
+                        return Boolean.TRUE;
+                    }
+
+                    if ((ch0 == 'n' || ch0 == 'N') && (ch1 == 'o' || ch1 == 'O')) {
+                        return Boolean.FALSE;
+                    }
+                    break;
+                case 3:
+                    ch0 = str.charAt(0);
+                    ch1 = str.charAt(1);
+                    ch2 = str.charAt(2);
+                    if ((ch0 == 'y' || ch0 == 'Y') && (ch1 == 'e' || ch1 == 'E') && (ch2 == 's' || ch2 == 'S')) {
+                        return Boolean.TRUE;
+                    }
+
+                    if ((ch0 == 'o' || ch0 == 'O') && (ch1 == 'f' || ch1 == 'F') && (ch2 == 'f' || ch2 == 'F')) {
+                        return Boolean.FALSE;
+                    }
+                    break;
+                case 4:
+                    ch0 = str.charAt(0);
+                    ch1 = str.charAt(1);
+                    ch2 = str.charAt(2);
+                    ch3 = str.charAt(3);
+                    if ((ch0 == 't' || ch0 == 'T') && (ch1 == 'r' || ch1 == 'R') && (ch2 == 'u' || ch2 == 'U') && (ch3 == 'e' || ch3 == 'E')) {
+                        return Boolean.TRUE;
+                    }
+                    break;
+                case 5:
+                    ch0 = str.charAt(0);
+                    ch1 = str.charAt(1);
+                    ch2 = str.charAt(2);
+                    ch3 = str.charAt(3);
+                    char ch4 = str.charAt(4);
+                    if ((ch0 == 'f' || ch0 == 'F') && (ch1 == 'a' || ch1 == 'A') && (ch2 == 'l' || ch2 == 'L') && (ch3 == 's' || ch3 == 'S') && (ch4 == 'e' || ch4 == 'E')) {
+                        return Boolean.FALSE;
+                    }
+                default:
+            }
+            return null;
+        }
     }
 }

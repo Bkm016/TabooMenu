@@ -1,7 +1,6 @@
 package me.skymc.taboomenu.iconcommand.impl;
 
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
-import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
 import org.bukkit.entity.Player;
 import org.bukkit.util.NumberConversions;

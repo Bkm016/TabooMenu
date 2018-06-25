@@ -32,9 +32,14 @@ public enum MenuSettings {
     AUTO_REFRESH("AUTO-REFRESH"),
 
     /**
-     * 菜单特效
+     * 菜单特效:开启
      */
     OPEN_ACTION("OPEN-ACTION"),
+
+    /**
+     * 菜单特效:关闭
+     */
+    CLOSE_ACTION("CLOSE-ACTION"),
 
     /**
      * 是否跳过权限判断

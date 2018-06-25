@@ -6,14 +6,15 @@ import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.setting.MenuSettings;
 import me.skymc.taboomenu.util.MapUtils;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -56,19 +57,28 @@ public class MenuSerializer {
     }
 
     private static void loadMenuSettings(Menu menu, YamlConfiguration configuration) {
-        Map<String, Object> values = configuration.getValues(false);
-        Object settingsSection = MapUtils.getOrDefaultIgnoreCase(values, "menu-settings", new Object());
-        if (settingsSection instanceof MemorySection) {
-            Map settingsMap = ((MemorySection) settingsSection).getValues(false);
-            menu.setName(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.NAME.getText(), ""));
-            menu.setRows(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.ROWS.getText(), 1));
-            menu.setPrevious(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
-            menu.setAutoRefresh(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
-            menu.setPermissionBypass(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
-            Arrays.stream(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));
-            IconCommandSerializer.readCommands(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.OPEN_ACTION.getText(), "")).forEach(action -> menu.getOpenAction().add(action));
-        }
+        Object settingsObject = MapUtils.getOrDefaultIgnoreCase(configuration.getValues(false), "menu-settings", new Object());
+        Map settingsMap = getSettingsMap(settingsObject);
+        menu.setName(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.NAME.getText(), ""));
+        menu.setRows(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.ROWS.getText(), 1));
+        menu.setPrevious(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
+        menu.setAutoRefresh(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
+        menu.setPermissionBypass(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
+        Arrays.stream(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));
+        IconCommandSerializer.readCommands(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.OPEN_ACTION.getText(), "")).forEach(action -> menu.getOpenAction().add(action));
+        IconCommandSerializer.readCommands(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.CLOSE_ACTION.getText(), "")).forEach(action -> menu.getCloseAction().add(action));
+    }
 
+    private static Map getSettingsMap(Object settingsObject) {
+        Map settingsMap;
+        if (settingsObject instanceof ConfigurationSection) {
+            settingsMap = ((ConfigurationSection) settingsObject).getValues(false);
+        } else if (settingsObject instanceof Map) {
+            settingsMap = (Map) settingsObject;
+        } else {
+            settingsMap = new HashMap();
+        }
+        return settingsMap;
     }
 
     private static void loadMenuIcons(File file, List<String> errors, Menu menu, YamlConfiguration configuration) {

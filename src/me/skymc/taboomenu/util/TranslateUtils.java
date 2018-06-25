@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class TranslateUtils {
 
     public static String getMessage(String message) {
-        return colored(TabooMenu.getInst().getConfig().getString("Messages." + message));
+        return colored(TabooMenu.getInst().getConfig().getString("Messages." + message, ""));
     }
 
     public static String format(Player player, String text) {

@@ -21,7 +21,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.IOException;

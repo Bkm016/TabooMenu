@@ -1,7 +1,6 @@
 package me.skymc.taboomenu.util;
 
 import me.skymc.taboomenu.TabooMenu;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayOutputStream;

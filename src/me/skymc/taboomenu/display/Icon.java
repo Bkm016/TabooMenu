@@ -3,13 +3,9 @@ package me.skymc.taboomenu.display;
 import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.TabooMenuAPI;
-import me.skymc.taboomenu.display.data.ClickType;
-import me.skymc.taboomenu.display.data.IconAction;
-import me.skymc.taboomenu.display.data.RequiredItem;
-import me.skymc.taboomenu.display.data.Requirement;
+import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
-import me.skymc.taboomenu.iconcommand.IconCommand;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
 import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
@@ -21,7 +17,6 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -30,10 +25,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +33,8 @@ import java.util.stream.Collectors;
  * @Since 2018-06-05 20:07
  */
 public class Icon implements Cloneable {
+
+    private static Random random = new Random();
 
     private Material material;
     private short data;
@@ -179,10 +173,10 @@ public class Icon implements Cloneable {
     public void executeCommand(Player player, List<IconCommand> iconCommands) {
         int delay = 0;
         for (IconCommand iconCommand : iconCommands) {
-            if (iconCommand.getCommand() instanceof IconCommandDelay) {
-                delay += ((IconCommandDelay) iconCommand.getCommand()).getDelay();
-            } else {
-                Bukkit.getScheduler().runTaskLater(TabooMenu.getInst(), () -> iconCommand.getCommand().execute(player), delay);
+            if (iconCommand.getCommands().get(0) instanceof IconCommandDelay) {
+                delay += ((IconCommandDelay) iconCommand.getCommands().get(0)).getDelay();
+            } else if (random.nextDouble() <= iconCommand.getChange()) {
+                Bukkit.getScheduler().runTaskLater(TabooMenu.getInst(), () -> iconCommand.getCommands().forEach(command -> command.execute(player)), delay);
             }
         }
     }

@@ -12,8 +12,6 @@ import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.block.banner.PatternType;
-import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 import java.util.stream.Collectors;

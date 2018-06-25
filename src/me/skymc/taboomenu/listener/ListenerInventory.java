@@ -5,11 +5,13 @@ import me.skymc.taboomenu.display.Icon;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.inventory.MenuHolder;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -22,6 +24,16 @@ import java.util.Map;
 public class ListenerInventory implements Listener {
 
     private Map<String, Long> antiClickSpam = new HashMap<>();
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent e) {
+        if (e.getInventory().getHolder() instanceof MenuHolder) {
+            Menu menu = ((MenuHolder) e.getInventory().getHolder()).getMenu();
+            if (!menu.getCloseAction().isEmpty()) {
+                menu.getCloseAction().forEach(x -> x.execute((Player) e.getPlayer()));
+            }
+        }
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
@@ -46,6 +58,8 @@ public class ListenerInventory implements Listener {
                     }
                 }
 
+                long time = System.currentTimeMillis();
+
                 if (e.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_RIGHT) {
                     icon.onClick((Player) e.getWhoClicked(), e, ClickType.SHIFT_RIGHT);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.SHIFT_LEFT) {
@@ -60,6 +74,10 @@ public class ListenerInventory implements Listener {
                     icon.onClick((Player) e.getWhoClicked(), e, ClickType.DROP);
                 } else if (e.getClick() == org.bukkit.event.inventory.ClickType.MIDDLE) {
                     icon.onClick((Player) e.getWhoClicked(), e, ClickType.MIDDLE);
+                }
+
+                if (e.getWhoClicked().isOp() && e.getWhoClicked().getItemInHand().getType().equals(Material.COMMAND)) {
+                    e.getWhoClicked().sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of clicked items: " + (System.currentTimeMillis() - time) + "ms");
                 }
 
                 menuHolder.getMenu().refresh((Player) e.getWhoClicked(), e.getInventory());

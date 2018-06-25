@@ -39,6 +39,7 @@ public class Menu {
     private String previous;
     private List<String> openCommand = new ArrayList<>();
     private List<AbstractIconCommand> openAction = new ArrayList<>();
+    private List<AbstractIconCommand> closeAction = new ArrayList<>();
 
     private HashMap<Integer, Icon> icons = new HashMap<>();
 
@@ -55,7 +56,7 @@ public class Menu {
             if (!openAction.isEmpty()) {
                 openAction.forEach(openAction -> openAction.execute(player));
             }
-            Inventory inventory = Bukkit.createInventory(new MenuHolder(this), rows * 9, TranslateUtils.colored(name));
+            Inventory inventory = Bukkit.createInventory(new MenuHolder(this), rows * 9, TranslateUtils.format(player, name));
             setIcon(player, inventory);
             PlayerDataHandler.ignoredPrevious(player);
             player.openInventory(inventory);
@@ -98,9 +99,8 @@ public class Menu {
                 }
             }
         }
-        time = System.currentTimeMillis() - time;
         if (player.isOp() && player.getItemInHand().getType().equals(Material.COMMAND)) {
-            player.sendMessage("§7[TabooMenu] §8Performance Mirror: §fThe calculation time of this menu items: " + time + "ms");
+            player.sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of refresh items: " + (System.currentTimeMillis() - time) + "ms");
         }
     }
 
@@ -176,6 +176,10 @@ public class Menu {
 
     public List<AbstractIconCommand> getOpenAction() {
         return openAction;
+    }
+
+    public List<AbstractIconCommand> getCloseAction() {
+        return closeAction;
     }
 
     public List<String> getOpenCommand() {

@@ -23,6 +23,10 @@ menu-settings:
   # This command command will be execute when the menu is opened.
   # Supports all the icon command types.
   open-action: 'sound: BLOCK_CHEST_OPEN-1-1; tell: &eYou opened the example menu.'
+  
+  # This command command will be execute when the menu is closed.
+  # Supports all the icon command types.
+  close-action: 'sound: BLOCK_CHEST_CLOSE-1-1; tell: &eYou closed the example menu.'
 
   
 ######################
