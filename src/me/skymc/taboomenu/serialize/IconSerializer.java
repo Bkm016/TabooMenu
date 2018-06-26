@@ -8,10 +8,12 @@ import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.setting.IconSettings;
+import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,6 +53,10 @@ public class IconSerializer {
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.BANNER_PATTERN.getText())) {
             icon.setBannerPatterns(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.BANNER_PATTERN.getText(), Collections.emptyList()));
+        }
+
+        if (MapUtils.containsIgnoreCase(map, IconSettings.POTION_TYPE.getText())) {
+            icon.setPotionType(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.POTION_TYPE.getText(), "").toUpperCase().split("-"));
         }
 
         double price = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PRICE.getText(), 0).doubleValue();
@@ -94,18 +100,23 @@ public class IconSerializer {
             loadIconAction(map, iconName, fileName, errors, icon);
         }
 
+        if (MapUtils.containsIgnoreCase(map, IconSettings.SKULL_TEXTURE.getText())) {
+            loadSkullTexture(map, iconName, fileName, errors, icon);
+        }
+
         if (!icon.getRequirements().isEmpty()) {
             icon.getRequirements().sort(Comparator.comparingInt(Requirement::getPriority));
         }
 
+        icon.setFull(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.FULL.getText(), false));
         icon.setShiny(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SHINY.getText(), false));
         icon.setColor(parseColor(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
+        icon.setEggType(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.EGG_TYPE.getText(), "").toUpperCase());
         icon.setSkullOwner(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SKULL_OWNER.getText(), ""));
         icon.setPermission(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION.getText(), ""));
         icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_VIEW.getText(), ""));
         icon.setPermissionMessage(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
         icon.setHideAttribute(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
-        icon.setFull(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.FULL.getText(), false));
 
         loadDeprecatedSettings(map, icon);
         return icon;
@@ -145,6 +156,25 @@ public class IconSerializer {
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid SLOT-COPY: " + e.toString());
             }
         }
+    }
+
+    private static void loadSkullTexture(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
+        if (!TabooLibHook.isTabooLibEnabled()) {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: cannot found TabooLib");
+            return;
+        }
+        Object textureObject = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SKULL_TEXTURE.getText(), new Object());
+        Map textureMap;
+        if (textureObject instanceof ConfigurationSection) {
+            textureMap = ((ConfigurationSection) textureObject).getValues(false);
+        } else if (textureObject instanceof Map) {
+            textureMap = (Map) textureObject;
+        } else {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: not a Map");
+            return;
+        }
+        icon.setSkullId(MapUtils.getOrDefaultIgnoreCase(textureMap, "id", ""));
+        icon.setSkullTexture(MapUtils.getOrDefaultIgnoreCase(textureMap, "texture", ""));
     }
 
     private static Color parseColor(String input, List<String> errors) {

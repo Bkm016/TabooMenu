@@ -152,7 +152,6 @@ menu-settings:
   banner-pattern:
   - 'BLACK MOJANG'
   - 'WHITE'
-
   
 26:
   name: '&6Close the menu'

@@ -13,6 +13,7 @@ import me.skymc.taboomenu.serialize.MenuSerializer;
 import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlaceholderHook;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
+import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.Bukkit;
@@ -44,6 +45,9 @@ public class TabooMenu extends JavaPlugin {
         inst = this;
         tLogger = TLogger.getUnformatted(this);
 
+        if (TabooLibHook.setupTabooLib()) {
+            tLogger.finest("Hooked TabooLib.");
+        }
         if (EconomyBridge.setupEconomy()) {
             tLogger.finest("Hooked Economy.");
         }

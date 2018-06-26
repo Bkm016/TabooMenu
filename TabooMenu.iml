@@ -21,5 +21,6 @@
     <orderEntry type="library" name="PlaceholderAPI" level="application" />
     <orderEntry type="library" name="1_11_R1" level="application" />
     <orderEntry type="library" name="1_7_R4" level="application" />
+    <orderEntry type="library" name="TabooLib-Latest" level="application" />
   </component>
 </module>

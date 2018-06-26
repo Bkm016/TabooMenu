@@ -152,6 +152,22 @@ public enum IconSettings {
     ACTION_CLICK_PRECOMPILE("CLICK-PRECOMPILE"),
 
     /**
+     * 生成蛋类型
+     */
+    EGG_TYPE("EGG-TYPE"),
+
+    /**
+     * 药水类型
+     */
+    POTION_TYPE("POTION-TYPE"),
+
+    /**
+     * 头颅皮肤
+     * 依赖插件:TabooLib
+     */
+    SKULL_TEXTURE("SKULL-TEXTURE"),
+
+    /**
      * 用于旧数据导入
      */
     DEPRECATED_DATA_VALUE("DATA-VALUE"),
