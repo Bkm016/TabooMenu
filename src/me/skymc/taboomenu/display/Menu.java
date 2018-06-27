@@ -4,7 +4,7 @@ import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.event.IconViewEvent;
 import me.skymc.taboomenu.event.MenuOpenEvent;
-import me.skymc.taboomenu.handler.PlayerDataHandler;
+import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.util.TranslateUtils;
@@ -58,7 +58,7 @@ public class Menu {
             }
             Inventory inventory = Bukkit.createInventory(new MenuHolder(this), rows * 9, TranslateUtils.format(player, name));
             setIcon(player, inventory);
-            PlayerDataHandler.ignoredPrevious(player);
+            DataHandler.ignoredPrevious(player);
             player.openInventory(inventory);
         } catch (Exception e) {
             player.sendMessage("§cAn internal error occurred while opening the menu:");

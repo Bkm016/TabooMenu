@@ -1,6 +1,6 @@
 package me.skymc.taboomenu.iconcommand.impl;
 
-import me.skymc.taboomenu.handler.PlayerDataHandler;
+import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.iconcommand.AbstractIconCommand;
 import org.bukkit.entity.Player;
 
@@ -24,7 +24,7 @@ public class IconCommandClose extends AbstractIconCommand {
     @Override
     public void execute(Player player) {
         if (closeType == CloseType.CLOSE) {
-            PlayerDataHandler.ignoredPrevious(player);
+            DataHandler.ignoredPrevious(player);
         }
         player.closeInventory();
     }

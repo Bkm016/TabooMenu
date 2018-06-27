@@ -3,6 +3,7 @@ package me.skymc.taboomenu;
 import com.google.common.io.Files;
 import me.skymc.taboomenu.bstats.Metrics;
 import me.skymc.taboomenu.display.Menu;
+import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.listener.ListenerCommand;
@@ -105,8 +106,9 @@ public class TabooMenu extends JavaPlugin {
     }
 
     public void load(List<String> errors) {
-        menus.clear();
+        DataHandler.getTextureSkulls().clear();
 
+        menus.clear();
         File file = new File(getDataFolder(), "config.yml");
         if (!file.exists()) {
             saveResource("config.yml", true);

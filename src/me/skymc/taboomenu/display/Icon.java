@@ -5,6 +5,7 @@ import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
+import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.JavaScriptHandler;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
 import me.skymc.taboomenu.support.EconomyBridge;
@@ -248,11 +249,25 @@ public class Icon implements Cloneable {
             return new ItemStack(Material.AIR);
         }
 
-        ItemStack itemStack = new ItemStack(material, amount, data);
+        ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
+
+        if (!StringUtils.isBlank(skullTexture) && TabooLibHook.isTabooLibEnabled() && itemMeta instanceof SkullMeta) {
+            ItemStack finalItemStack = itemStack;
+            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(skullId, x -> TabooLibHook.setSkullTexture(finalItemStack, skullId, skullTexture));
+            itemMeta = itemStack.getItemMeta();
+        }
 
         if (!StringUtils.isBlank(name)) {
             itemMeta.setDisplayName(TranslateUtils.format(player, name));
+        }
+
+        if (!StringUtils.isBlank(skullOwner) && itemMeta instanceof SkullMeta) {
+            ((SkullMeta) itemMeta).setOwner(TranslateUtils.format(player, skullOwner));
+        }
+
+        if (!StringUtils.isBlank(eggType) && VersionUtils.getVersionNumber() >= 11100 && itemMeta instanceof SpawnEggMeta) {
+            formatSpawnEgg((SpawnEggMeta) itemMeta);
         }
 
         if (lore != null) {
@@ -263,14 +278,6 @@ public class Icon implements Cloneable {
             ((LeatherArmorMeta) itemMeta).setColor(color);
         }
 
-        if (!StringUtils.isBlank(skullOwner) && itemMeta instanceof SkullMeta) {
-            ((SkullMeta) itemMeta).setOwner(TranslateUtils.format(player, skullOwner));
-        }
-
-        if (eggType != null && VersionUtils.getVersionNumber() >= 10900 && itemMeta instanceof SpawnEggMeta) {
-            formatSpawnEgg((SpawnEggMeta) itemMeta);
-        }
-
         if (potionType != null && VersionUtils.getVersionNumber() >= 10900 && itemMeta instanceof PotionMeta) {
             formatPotion((PotionMeta) itemMeta);
         }
@@ -279,17 +286,17 @@ public class Icon implements Cloneable {
             formatBanner((BannerMeta) itemMeta);
         }
 
-        itemStack.setItemMeta(itemMeta);
-
         if (shiny) {
             itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
         }
+
         if (hideAttribute) {
             itemStack = AttributeUtils.hideAttributes(itemStack);
         }
-        if (!StringUtils.isBlank(skullTexture) && TabooLibHook.isTabooLibEnabled() && itemMeta instanceof SkullMeta) {
-            itemStack = TabooLibHook.setSkullTexture(itemStack, skullId, skullTexture);
-        }
+
+        itemStack.setItemMeta(itemMeta);
+        itemStack.setDurability(data);
+        itemStack.setAmount(amount);
         return itemStack;
     }
 

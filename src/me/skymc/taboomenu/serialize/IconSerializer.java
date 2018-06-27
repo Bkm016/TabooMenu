@@ -29,10 +29,10 @@ public class IconSerializer {
 
         Icon icon;
         try {
-            icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefault(map, IconSettings.AMOUNT.getText(), 1));
+            icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
         } catch (Exception ignored) {
             try {
-                icon = new Icon(Material.getMaterial(material[0].replace(" ", "_")), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefault(map, IconSettings.AMOUNT.getText(), 1));
+                icon = new Icon(Material.getMaterial(material[0].replace(" ", "_")), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
             } catch (Exception e) {
                 icon = new Icon(Material.BEDROCK, (short) 0, 1);
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: " + e.toString());
