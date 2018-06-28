@@ -1,11 +1,17 @@
 package me.skymc.taboomenu;
 
+import com.google.common.base.Preconditions;
 import me.skymc.taboomenu.display.Menu;
+import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.inventory.MenuHolder;
+import me.skymc.taboomenu.serialize.IconSerializer;
 import me.skymc.taboomenu.util.TranslateUtils;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,14 +20,19 @@ import java.util.List;
  */
 public class TabooMenuAPI {
 
-    /**
-     * Open the menu for player
-     *
-     * @param player   Target
-     * @param menuName FileName
-     * @param force    Permission Bypass
-     * @return {@link MenuState}
-     */
+    public enum MenuState {
+        OPENED, NO_PERMISSION, MENU_NOT_FOUND, UNKNOWN
+    }
+
+    public static RequiredItem createRequiredItem() {
+        return new RequiredItem();
+    }
+
+    public static ItemStack createItem(ConfigurationSection section, Player player) {
+        Preconditions.checkNotNull(section, "section cannot be null.");
+        return IconSerializer.loadIconFromMap(section.getValues(false), "<Unknown>", "<Unknown>", Collections.emptyList()).createItemStack(player);
+    }
+
     public static MenuState openMenu(Player player, String menuName, boolean force) {
         String finalMenuName = menuName.endsWith(".yml") ? menuName : menuName + ".yml";
         Menu menu = TabooMenu.getMenus().stream().filter(x -> x.getFile().getName().equalsIgnoreCase(finalMenuName)).findFirst().orElse(null);
@@ -50,9 +61,5 @@ public class TabooMenuAPI {
         List<String> fileName = new ArrayList<>();
         TabooMenu.getMenus().forEach(x -> fileName.add(x.getFile().getName()));
         return fileName;
-    }
-
-    public enum MenuState {
-        OPENED, NO_PERMISSION, MENU_NOT_FOUND, UNKNOWN
     }
 }

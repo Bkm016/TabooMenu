@@ -1,12 +1,10 @@
 package me.skymc.taboomenu.display.data;
 
 import me.skymc.taboomenu.util.StringUtils;
-import net.minecraft.util.org.apache.commons.lang3.BooleanUtils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.NumberConversions;
-import org.bukkit.util.StringUtil;
 
 import java.util.Objects;
 
@@ -16,13 +14,16 @@ import java.util.Objects;
  */
 public class RequiredItem {
 
-    private final String material;
-    private final String name;
-    private final String lore;
-    private final Integer damage;
-    private final Integer amount;
-    private final Boolean hasName;
-    private final Boolean hasLore;
+    private String material;
+    private String name;
+    private String lore;
+    private Integer damage;
+    private Integer amount;
+    private Boolean hasName;
+    private Boolean hasLore;
+
+    public RequiredItem() {
+    }
 
     public RequiredItem(String material, String name, String lore, Integer damage, Integer amount, Boolean hasName, Boolean hasLore) {
         this.material = material;
@@ -191,5 +192,40 @@ public class RequiredItem {
 
     public Boolean isHasLore() {
         return hasLore;
+    }
+
+    public RequiredItem setMaterial(String material) {
+        this.material = material;
+        return this;
+    }
+
+    public RequiredItem setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public RequiredItem setLore(String lore) {
+        this.lore = lore;
+        return this;
+    }
+
+    public RequiredItem setDamage(Integer damage) {
+        this.damage = damage;
+        return this;
+    }
+
+    public RequiredItem setAmount(Integer amount) {
+        this.amount = amount;
+        return this;
+    }
+
+    public RequiredItem setHasName(Boolean hasName) {
+        this.hasName = hasName;
+        return this;
+    }
+
+    public RequiredItem setHasLore(Boolean hasLore) {
+        this.hasLore = hasLore;
+        return this;
     }
 }
