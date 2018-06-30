@@ -6,7 +6,7 @@ import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.DataHandler;
-import me.skymc.taboomenu.handler.JavaScriptHandler;
+import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
 import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
@@ -16,6 +16,8 @@ import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.*;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -197,7 +199,7 @@ public class Icon implements Cloneable {
                 if (icon.getIconAction().isClickPrecompile()) {
                     icon.getIconAction().getClickActionScript().eval(bindings);
                 } else {
-                    JavaScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getClickAction())).eval(bindings);
+                    ScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getClickAction())).eval(bindings);
                 }
             } catch (Exception e) {
                 TabooMenu.getTLogger().error("Action-Click javascript is invalid: " + e.toString());
@@ -212,7 +214,7 @@ public class Icon implements Cloneable {
                 if (icon.getIconAction().isViewPrecompile()) {
                     icon.getIconAction().getViewActionScript().eval(bindings);
                 } else {
-                    JavaScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getViewAction())).eval(bindings);
+                    ScriptHandler.compile(TranslateUtils.format(player, icon.getIconAction().getViewAction())).eval(bindings);
                 }
             } catch (Exception e) {
                 TabooMenu.getTLogger().error("Action-View javascript is invalid: " + e.toString());
@@ -231,7 +233,7 @@ public class Icon implements Cloneable {
                 if (requirement.isPreCompile()) {
                     result = requirement.getCompiledScript().eval(bindings);
                 } else {
-                    CompiledScript script = JavaScriptHandler.compile(TranslateUtils.format(player, requirement.getExpression()));
+                    CompiledScript script = ScriptHandler.compile(TranslateUtils.format(player, requirement.getExpression()));
                     result = script.eval(bindings);
                 }
                 if (result instanceof Boolean && (Boolean) result) {
@@ -334,13 +336,14 @@ public class Icon implements Cloneable {
                 Objects.equals(getBannerPatterns(), icon.getBannerPatterns()) &&
                 Objects.equals(getColor(), icon.getColor()) &&
                 Objects.equals(getSkullOwner(), icon.getSkullOwner()) &&
+                Objects.equals(getSkullId(), icon.getSkullId()) &&
+                Objects.equals(getSkullTexture(), icon.getSkullTexture()) &&
                 Objects.equals(getPermission(), icon.getPermission()) &&
                 Objects.equals(getPermissionMessage(), icon.getPermissionMessage()) &&
                 Objects.equals(getPermissionView(), icon.getPermissionView()) &&
                 Objects.equals(getIconAction(), icon.getIconAction()) &&
                 Objects.equals(getEggType(), icon.getEggType()) &&
-                Objects.equals(getPotionType(), icon.getPotionType()) &&
-                Objects.equals(getSkullTexture(), icon.getSkullTexture()) &&
+                Arrays.equals(getPotionType(), icon.getPotionType()) &&
                 Objects.equals(getSlotCopy(), icon.getSlotCopy()) &&
                 Objects.equals(getRequirements(), icon.getRequirements()) &&
                 Objects.equals(getIconCommands(), icon.getIconCommands()) &&
@@ -349,7 +352,9 @@ public class Icon implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getPotionType(), getSkullTexture(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems());
+        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems());
+        result = 31 * result + Arrays.hashCode(getPotionType());
+        return result;
     }
 
     @Override
@@ -363,6 +368,8 @@ public class Icon implements Cloneable {
                 ", bannerPatterns=" + bannerPatterns +
                 ", color=" + color +
                 ", skullOwner='" + skullOwner + '\'' +
+                ", skullId='" + skullId + '\'' +
+                ", skullTexture='" + skullTexture + '\'' +
                 ", price=" + price +
                 ", points=" + points +
                 ", levels=" + levels +
@@ -374,8 +381,7 @@ public class Icon implements Cloneable {
                 ", hideAttribute=" + hideAttribute +
                 ", iconAction=" + iconAction +
                 ", eggType='" + eggType + '\'' +
-                ", potionType='" + potionType + '\'' +
-                ", skullTexture='" + skullTexture + '\'' +
+                ", potionType=" + Arrays.toString(potionType) +
                 ", slotCopy=" + slotCopy +
                 ", requirements=" + requirements +
                 ", iconCommands=" + iconCommands +
@@ -409,10 +415,10 @@ public class Icon implements Cloneable {
                 }
             } else if (type.length == 2) {
                 try {
-                    itemMeta.addPattern(new org.bukkit.block.banner.Pattern(DyeColor.valueOf(type[0].toUpperCase()), org.bukkit.block.banner.PatternType.valueOf(type[1].toUpperCase())));
-                } catch (Exception ignored) {
-                    itemMeta.addPattern(new org.bukkit.block.banner.Pattern(DyeColor.BLACK, org.bukkit.block.banner.PatternType.BASE));
-                    TabooMenu.getTLogger().error(eggType + " is an invalid banner type.");
+                    itemMeta.addPattern(new Pattern(DyeColor.valueOf(type[0].toUpperCase()), PatternType.valueOf(type[1].toUpperCase())));
+                } catch (Exception e) {
+                    itemMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BASE));
+                    TabooMenu.getTLogger().error(eggType + " is an invalid banner type: " + e.toString());
                 }
             }
         }

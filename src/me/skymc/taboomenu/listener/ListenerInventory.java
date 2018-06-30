@@ -5,6 +5,8 @@ import me.skymc.taboomenu.display.Icon;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.inventory.MenuHolder;
+import me.skymc.taboomenu.inventory.TemplateHolder;
+import me.skymc.taboomenu.template.TemplateManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,6 +34,8 @@ public class ListenerInventory implements Listener {
             if (!menu.getCloseAction().isEmpty()) {
                 menu.getCloseAction().forEach(x -> x.execute((Player) e.getPlayer()));
             }
+        } else if (e.getInventory().getHolder() instanceof TemplateHolder) {
+            TemplateManager.saveTemplate((Player) e.getPlayer(), ((TemplateHolder) e.getInventory().getHolder()).getTemplate(), e.getInventory());
         }
     }
 

@@ -1,10 +1,9 @@
 package me.skymc.taboomenu;
 
-import com.google.common.io.Files;
 import me.skymc.taboomenu.bstats.Metrics;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.handler.DataHandler;
-import me.skymc.taboomenu.handler.JavaScriptHandler;
+import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.listener.ListenerCommand;
 import me.skymc.taboomenu.listener.ListenerInventory;
@@ -15,18 +14,17 @@ import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlaceholderHook;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
 import me.skymc.taboomenu.support.TabooLibHook;
+import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.AttributeUtils;
+import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +54,9 @@ public class TabooMenu extends JavaPlugin {
             tLogger.finest("Hooked PlayerPoints.");
         }
 
+        ScriptHandler.inst();
         AttributeUtils.setup();
-        JavaScriptHandler.inst();
+        TemplateManager.init();
 
         Bukkit.getPluginCommand("taboomenu").setExecutor(new TabooMenuCommand());
         Bukkit.getPluginCommand("taboomenu").setTabCompleter(new TabooMenuCommand());
@@ -83,12 +82,7 @@ public class TabooMenu extends JavaPlugin {
                 load(errors);
 
                 if (!errors.isEmpty()) {
-                    tLogger.error("#------------------- TabooMenu Errors -------------------#");
-                    int count = 1;
-                    for (String error : errors) {
-                        tLogger.error("(" + (count++) + ") &f" + error);
-                    }
-                    tLogger.error("#--------------------------------------------------------#");
+                    TranslateUtils.printErrors(errors);
                 } else {
                     tLogger.info("Loaded " + menus.size() + " menus. (" + (System.currentTimeMillis() - times) + "ms)");
                 }
@@ -114,20 +108,7 @@ public class TabooMenu extends JavaPlugin {
             saveResource("config.yml", true);
         }
 
-        config = new YamlConfiguration();
-        try {
-            config.loadFromString(Files.toString(file, Charset.forName("utf-8")));
-        } catch (InvalidConfigurationException e) {
-            errors.add("The config.yml was not a valid YAML, please look at the error above, Default values will be used.");
-            errors.add(e.toString());
-        } catch (IOException e) {
-            errors.add("I/O error while using the configuration. Default values will be used.");
-            errors.add(e.toString());
-        } catch (Exception e) {
-            errors.add("Unhandled error while reading the values for the configuration! Please inform the developer.");
-            errors.add(e.toString());
-        }
-
+        config = TranslateUtils.loadConfiguration(file, errors);
         File menusFolder = new File(getDataFolder(), "menu");
         if (!menusFolder.isDirectory()) {
             menusFolder.mkdirs();

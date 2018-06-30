@@ -1,7 +1,7 @@
 package me.skymc.taboomenu.display.data;
 
 import me.skymc.taboomenu.display.Icon;
-import me.skymc.taboomenu.handler.JavaScriptHandler;
+import me.skymc.taboomenu.handler.ScriptHandler;
 
 import javax.script.CompiledScript;
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class Requirement {
         this.expression = expression;
         this.preCompile = preCompile;
         if (this.preCompile) {
-            compiledScript = JavaScriptHandler.compile(expression);
+            compiledScript = ScriptHandler.compile(expression);
         } else {
             compiledScript = null;
         }

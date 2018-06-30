@@ -14,7 +14,7 @@ import java.util.Objects;
  * @Author sky
  * @Since 2018-06-02 22:48
  */
-public class JavaScriptHandler {
+public class ScriptHandler {
 
     private static ScriptEngine scriptEngine;
     private static ScriptEngineManager scriptEngineManager = new ScriptEngineManager();

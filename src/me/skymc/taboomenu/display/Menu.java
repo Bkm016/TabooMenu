@@ -88,7 +88,7 @@ public class Menu {
         for (Map.Entry<Integer, Icon> entry : icons.entrySet()) {
             if (entry.getValue() == null || !entry.getValue().canViewIcon(player)) {
                 inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
-            } else {
+            } else if (entry.getKey() < inventory.getSize()) {
                 IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
                 Bukkit.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {

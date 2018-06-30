@@ -6,7 +6,7 @@ import me.skymc.taboomenu.display.Icon;
 import me.skymc.taboomenu.display.data.IconAction;
 import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
-import me.skymc.taboomenu.handler.JavaScriptHandler;
+import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
@@ -16,7 +16,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @Author sky
@@ -44,11 +43,11 @@ public class IconSerializer {
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.NAME.getText())) {
-            icon.setName(TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Name", "&f") + MapUtils.getOrDefaultIgnoreCase(map, IconSettings.NAME.getText(), ""));
+            loreItemName(map, icon);
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.LORE.getText())) {
-            icon.setLore(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LORE.getText(), Collections.emptyList()).stream().map(x -> TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Lore", "&7") + x).collect(Collectors.toList()));
+            loadItemLore(map, icon);
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.BANNER_PATTERN.getText())) {
@@ -136,6 +135,24 @@ public class IconSerializer {
             icon.setShiny(true);
         }
         icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText(), ""));
+    }
+
+    private static void loreItemName(Map<String, Object> map, Icon icon) {
+        icon.setName(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.NAME.getText(), ""));
+        if (!(icon.getName().startsWith("&") || icon.getName().startsWith("§"))) {
+            icon.setName(TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Name", "&f") + icon.getName());
+        }
+    }
+
+    private static void loadItemLore(Map<String, Object> map, Icon icon) {
+        List<String> itemLore = new ArrayList<>(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LORE.getText(), Collections.emptyList()));
+        for (int i = 0; i < itemLore.size(); i++) {
+            String lore = itemLore.get(i);
+            if (!(lore.startsWith("&") || lore.startsWith("§"))) {
+                itemLore.set(i, TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Lore", "&7") + lore);
+            }
+        }
+        icon.setLore(itemLore);
     }
 
     private static void loadRequiredItems(Map<String, Object> map, Icon icon) {
@@ -280,7 +297,7 @@ public class IconSerializer {
                     iconAction.setViewAction(expression);
                     iconAction.setViewPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
                     if (iconAction.isViewPrecompile()) {
-                        iconAction.setViewActionScript(JavaScriptHandler.compile(expression));
+                        iconAction.setViewActionScript(ScriptHandler.compile(expression));
                     }
                 }
                 if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_CLICK.getText())) {
@@ -288,7 +305,7 @@ public class IconSerializer {
                     iconAction.setClickAction(expression);
                     iconAction.setClickPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
                     if (iconAction.isClickPrecompile()) {
-                        iconAction.setClickActionScript(JavaScriptHandler.compile(expression));
+                        iconAction.setClickActionScript(ScriptHandler.compile(expression));
                     }
                 }
             } catch (Exception e) {
