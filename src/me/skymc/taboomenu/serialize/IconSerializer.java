@@ -87,10 +87,6 @@ public class IconSerializer {
             loadSlotCopy(map, iconName, fileName, errors, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIREMENT.getText())) {
-            loadRequirements(map, iconName, fileName, errors, icon);
-        }
-
         if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIRED_ITEM.getText())) {
             loadRequiredItems(map, icon);
         }
@@ -117,7 +113,18 @@ public class IconSerializer {
         icon.setPermissionMessage(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
         icon.setHideAttribute(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
 
-        loadDeprecatedSettings(map, icon);
+        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_ENCHANTMENT.getText())) {
+            icon.setShiny(true);
+        }
+        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
+            icon.setData(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
+        }
+        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText())) {
+            icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText(), ""));
+        }
+        if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIREMENT.getText())) {
+            loadRequirements(map, iconName, fileName, errors, icon);
+        }
         return icon;
     }
 
@@ -126,16 +133,6 @@ public class IconSerializer {
     //         Private Methods
     //
     // *********************************
-
-    private static void loadDeprecatedSettings(Map<String, Object> map, Icon icon) {
-        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
-            icon.setData(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
-        }
-        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_ENCHANTMENT.getText())) {
-            icon.setShiny(true);
-        }
-        icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText(), ""));
-    }
 
     private static void loreItemName(Map<String, Object> map, Icon icon) {
         icon.setName(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.NAME.getText(), ""));

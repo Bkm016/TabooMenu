@@ -288,17 +288,16 @@ public class Icon implements Cloneable {
             formatBanner((BannerMeta) itemMeta);
         }
 
-        if (shiny) {
-            itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-        }
-
-        if (hideAttribute) {
-            itemStack = AttributeUtils.hideAttributes(itemStack);
-        }
-
         itemStack.setItemMeta(itemMeta);
         itemStack.setDurability(data);
         itemStack.setAmount(amount);
+
+        if (shiny) {
+            itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+        }
+        if (hideAttribute) {
+            AttributeUtils.hideAttributes(itemStack);
+        }
         return itemStack;
     }
 
