@@ -99,10 +99,6 @@ public class IconSerializer {
             loadSkullTexture(map, iconName, fileName, errors, icon);
         }
 
-        if (!icon.getRequirements().isEmpty()) {
-            icon.getRequirements().sort(Comparator.comparingInt(Requirement::getPriority));
-        }
-
         icon.setFull(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.FULL.getText(), false));
         icon.setShiny(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SHINY.getText(), false));
         icon.setColor(parseColor(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
@@ -275,11 +271,13 @@ public class IconSerializer {
                     errors.add("The icon \"" + requirementIcon + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: ITEM cannot be null.");
                     continue;
                 }
-
                 icon.getRequirements().add(new Requirement(requirementItem, requirementPriority, requirementScript, preCompile));
             } else {
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: " + requirementOrigin);
             }
+        }
+        if (!icon.getRequirements().isEmpty()) {
+            icon.getRequirements().sort(Comparator.comparingInt(Requirement::getPriority));
         }
     }
 
