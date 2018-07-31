@@ -30,7 +30,7 @@ public class TabooMenuAPI {
 
     public static ItemStack createItem(ConfigurationSection section, Player player) {
         Preconditions.checkNotNull(section, "section cannot be null.");
-        return IconSerializer.loadIconFromMap(section.getValues(false), "<Unknown>", "<Unknown>", Collections.emptyList()).createItemStack(player);
+        return IconSerializer.loadIconFromMap(section.getValues(false), "<Unknown>", "<Unknown>", 0, Collections.emptyList()).createItemStack(player);
     }
 
     public static MenuState openMenu(Player player, String menuName, boolean force) {

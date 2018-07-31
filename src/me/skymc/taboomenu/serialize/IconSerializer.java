@@ -6,11 +6,14 @@ import me.skymc.taboomenu.display.Icon;
 import me.skymc.taboomenu.display.data.IconAction;
 import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
+import me.skymc.taboomenu.event.IconLoadEvent;
 import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
+import me.skymc.taboomenu.version.Material_v1_12;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,12 +26,16 @@ import java.util.*;
  */
 public class IconSerializer {
 
-    public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, List<String> errors) {
+    public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
         String[] material = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().split(":");
 
         Icon icon;
         try {
-            icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+            if (TabooMenu.getInst().isNewAPI()) {
+                icon = new Icon(Material.getMaterial(Material_v1_12.getMaterial(Integer.valueOf(material[0])).name()), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+            } else {
+                icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+            }
         } catch (Exception ignored) {
             try {
                 icon = new Icon(Material.getMaterial(material[0].replace(" ", "_")), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
@@ -121,7 +128,10 @@ public class IconSerializer {
         if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIREMENT.getText())) {
             loadRequirements(map, iconName, fileName, errors, icon);
         }
-        return icon;
+
+        IconLoadEvent iconLoadEvent = new IconLoadEvent(icon, iconName, fileName, requirementIndex, map);
+        Bukkit.getPluginManager().callEvent(iconLoadEvent);
+        return iconLoadEvent.getIcon();
     }
 
     // *********************************
@@ -189,11 +199,9 @@ public class IconSerializer {
 
     private static Color parseColor(String input, List<String> errors) {
         String[] split = StringUtils.stripChars(input, " ").split(",");
-
         if (split.length != 3) {
             errors.add(Arrays.asList(split) + " must be in the format \"red, green, blue\".");
         }
-
         int red = 0, green = 0, blue = 0;
         try {
             red = Integer.parseInt(split[0]);
@@ -202,7 +210,6 @@ public class IconSerializer {
         } catch (NumberFormatException ex) {
             errors.add(Arrays.asList(split) + " contains invalid numbers.");
         }
-
         if (red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue > 255) {
             errors.add(Arrays.asList(split) + " should only contain numbers between 0 and 255.");
         }
@@ -213,7 +220,6 @@ public class IconSerializer {
         String errorMaterial = s.replace(" ", "_");
         double degree = -1;
         double degreeLimit = TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit");
-
         for (String alias : TabooMenu.getInst().getConfig().getConfigurationSection("Aliases").getKeys(false)) {
             if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
                 degree = 1;
@@ -224,7 +230,6 @@ public class IconSerializer {
                 break;
             }
         }
-
         if (degree < degreeLimit) {
             for (Material materialOther : Material.values()) {
                 double degreeNew = StringUtils.similarDegree(materialOther.name(), errorMaterial);
@@ -259,7 +264,7 @@ public class IconSerializer {
 
                 Icon requirementItem;
                 if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText())) {
-                    requirementItem = loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), requirementIcon, fileName, errors);
+                    requirementItem = loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), requirementIcon, fileName, i, errors);
                 } else if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.COMMAND.getText())) {
                     requirementItem = (Icon) icon.clone();
                     if (requirementItem == null) {

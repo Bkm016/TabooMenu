@@ -80,7 +80,7 @@ public class ListenerInventory implements Listener {
                     icon.onClick((Player) e.getWhoClicked(), e, ClickType.MIDDLE);
                 }
 
-                if (e.getWhoClicked().isOp() && e.getWhoClicked().getItemInHand().getType().equals(Material.COMMAND)) {
+                if (e.getWhoClicked().isOp() && e.getWhoClicked().getItemInHand().getType().equals(TabooMenu.getInst().isNewAPI() ? Material.getMaterial("COMMAND_BLOCK") : Material.getMaterial("COMMAND"))) {
                     e.getWhoClicked().sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of clicked items: " + (System.currentTimeMillis() - time) + "ms");
                 }
 

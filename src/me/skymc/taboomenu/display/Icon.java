@@ -3,19 +3,21 @@ package me.skymc.taboomenu.display;
 import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.TabooMenuAPI;
+import me.skymc.taboomenu.condition.IconCondition;
 import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
-import me.skymc.taboomenu.support.EconomyBridge;
-import me.skymc.taboomenu.support.PlayerPointsBridge;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
@@ -77,110 +79,54 @@ public class Icon implements Cloneable {
     private List<IconCommand> iconCommands = new ArrayList<>();
     private List<RequiredItem> requiredItems = new ArrayList<>();
 
+    private String menuName;
+    private String iconName;
+    private int requirementIndex;
+
     public Icon(Material material, short data, int amount) {
         this.material = material;
         this.data = data;
         this.amount = amount;
     }
 
+    /**
+     * 是否可以查看物品
+     *
+     * @param player 玩家
+     * @return boolean
+     */
+    public boolean canIconView(Player player) {
+        return IconCondition.getIconConditions().stream().filter(IconCondition::inView).anyMatch(condition -> condition.check(player, null, null, this));
+    }
+
+    /**
+     * 当物品被点击
+     *
+     * @param player     玩家
+     * @param clickEvent 点击事件
+     * @param clickType  点击类型
+     */
     public void onClick(Player player, InventoryClickEvent clickEvent, ClickType clickType) {
         Icon icon = getEffectiveIcon(player, clickType);
-
         IconClickEvent event = new IconClickEvent(player, TabooMenuAPI.getPlayerCurrentMenu(player), this);
         Bukkit.getPluginManager().callEvent(event);
-
         if (event.isCancelled()) {
             return;
         }
-
-        // ****************************************
-        //
-        //           Check Requirement
-        //
-        // ****************************************
-
-        if (!icon.canViewIcon(player)) {
+        if (IconCondition.getIconConditions().stream().anyMatch(condition -> !condition.check(player, clickEvent, clickType, this))) {
             return;
         }
-
-        if (!icon.canClickIcon(player)) {
-            player.sendMessage(permissionMessage != null ? permissionMessage : TranslateUtils.getMessage("no-permission"));
-            return;
-        }
-
-        if (icon.price > 0) {
-            if (!EconomyBridge.hasValidEconomy()) {
-                player.sendMessage(ChatColor.RED + "This command has a price, but Vault with a compatible economy plugin was not found. For security, the command has been blocked. Please inform the staff.");
-                return;
-            }
-            if (!EconomyBridge.hasMoney(player, icon.price)) {
-                player.sendMessage(TranslateUtils.getMessage("no-money").replace("{money}", EconomyBridge.formatMoney(icon.price)));
-                return;
-            }
-        }
-
-        if (icon.points > 0) {
-            if (!PlayerPointsBridge.hasValidPlugin()) {
-                player.sendMessage(ChatColor.RED + "This command has a price in points, but the plugin PlayerPoints was not found. For security, the command has been blocked. Please inform the staff.");
-                return;
-            }
-
-            if (!PlayerPointsBridge.hasPoints(player, icon.points)) {
-                player.sendMessage(TranslateUtils.getMessage("no-points").replace("{points}", Integer.toString(icon.points)));
-                return;
-            }
-        }
-
-        if (icon.levels > 0) {
-            if (player.getLevel() < icon.levels) {
-                player.sendMessage(TranslateUtils.getMessage("no-exp").replace("{levels}", Integer.toString(icon.levels)));
-                return;
-            }
-        }
-
-        if (!icon.requiredItems.isEmpty()) {
-            if (icon.requiredItems.stream().anyMatch(x -> !x.hasItem(player))) {
-                player.sendMessage(TranslateUtils.getMessage("no-required-item"));
-                return;
-            }
-        }
-
-        // ****************************************
-        //
-        //           Take Requirement
-        //
-        // ****************************************
-
-        if (icon.price > 0 && !EconomyBridge.takeMoney(player, icon.price)) {
-            player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff.");
-            return;
-        }
-
-        if (icon.points > 0 && !PlayerPointsBridge.takePoints(player, icon.points)) {
-            player.sendMessage(ChatColor.RED + "Error: the transaction couldn't be executed. Please inform the staff.");
-            return;
-        }
-
-        if (icon.levels > 0) {
-            player.setLevel(player.getLevel() - icon.levels);
-        }
-
-        if (!icon.requiredItems.isEmpty()) {
-            icon.requiredItems.forEach(x -> x.takeItem(player));
-        }
-
-        executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
+        IconCondition.getIconConditions().forEach(condition -> condition.check(player, clickEvent, clickType, this));
         executeClickAction(player, clickEvent, clickType, icon);
+        executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
     }
 
-    public boolean canClickIcon(Player player) {
-        return StringUtils.isBlank(permission) || (permission.startsWith("-") ? !player.hasPermission(permission.substring(1)) : player.hasPermission(permission));
-    }
-
-    public boolean canViewIcon(Player player) {
-        return StringUtils.isBlank(permissionView) || (permissionView.startsWith("-") ? !player.hasPermission(permissionView.substring(1)) : player.hasPermission(permissionView));
-    }
-
+    /**
+     * 执行物品命令
+     *
+     * @param player       玩家
+     * @param iconCommands 命令
+     */
     public void executeCommand(Player player, List<IconCommand> iconCommands) {
         int delay = 0;
         for (IconCommand iconCommand : iconCommands) {
@@ -192,6 +138,14 @@ public class Icon implements Cloneable {
         }
     }
 
+    /**
+     * 执行物品点击动作
+     *
+     * @param player     玩家
+     * @param clickEvent 点击事件
+     * @param clickType  点击类型
+     * @param icon       物品对象
+     */
     public void executeClickAction(Player player, InventoryClickEvent clickEvent, ClickType clickType, Icon icon) {
         if (icon.getIconAction() != null && icon.getIconAction().getClickAction() != null) {
             SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name(), "clickEvent", clickEvent));
@@ -207,6 +161,13 @@ public class Icon implements Cloneable {
         }
     }
 
+    /**
+     * 执行物品展示动作
+     *
+     * @param player    玩家
+     * @param itemStack 物品
+     * @param icon      物品对象
+     */
     public void executeViewAction(Player player, ItemStack itemStack, Icon icon) {
         if (icon.getIconAction() != null && icon.getIconAction().getViewAction() != null) {
             SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "viewItem", itemStack));
@@ -222,6 +183,13 @@ public class Icon implements Cloneable {
         }
     }
 
+    /**
+     * 获取有效物品图标（判断 Requirement）
+     *
+     * @param player    玩家
+     * @param clickType 点击类型
+     * @return {@link Icon}
+     */
     public Icon getEffectiveIcon(Player player, ClickType clickType) {
         if (requirements.isEmpty()) {
             return this;
@@ -246,6 +214,12 @@ public class Icon implements Cloneable {
         return this;
     }
 
+    /**
+     * 创建物品展示图标
+     *
+     * @param player 玩家
+     * @return {@link ItemStack}
+     */
     public ItemStack createItemStack(Player player) {
         if (material.equals(Material.AIR)) {
             return new ItemStack(Material.AIR);
@@ -662,5 +636,29 @@ public class Icon implements Cloneable {
 
     public void setSkullId(String skullId) {
         this.skullId = skullId;
+    }
+
+    public String getMenuName() {
+        return menuName;
+    }
+
+    public void setMenuName(String menuName) {
+        this.menuName = menuName;
+    }
+
+    public String getIconName() {
+        return iconName;
+    }
+
+    public void setIconName(String iconName) {
+        this.iconName = iconName;
+    }
+
+    public int getRequirementIndex() {
+        return requirementIndex;
+    }
+
+    public void setRequirementIndex(int requirementIndex) {
+        this.requirementIndex = requirementIndex;
     }
 }

@@ -28,6 +28,7 @@ Messages:
   no-points: '&cYou need {points} player points for this.'
   no-permission: '&cYou don''t have permission for this icon.'
   no-required-item: '&cYou don''t have required item for this icon.'
+  in-cooldown: '&cYou must wait &4{day} days {hour} hours {minute} minutes {second} seconds &cfor this.'
   
 ######################
 #+                  +#

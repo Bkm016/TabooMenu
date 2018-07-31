@@ -86,7 +86,7 @@ public class Menu {
     public void refresh(Player player, Inventory inventory) {
         long time = System.currentTimeMillis();
         for (Map.Entry<Integer, Icon> entry : icons.entrySet()) {
-            if (entry.getValue() == null || !entry.getValue().canViewIcon(player)) {
+            if (entry.getValue() == null || !entry.getValue().canIconView(player)) {
                 inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
             } else if (entry.getKey() < inventory.getSize()) {
                 IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
@@ -99,7 +99,7 @@ public class Menu {
                 }
             }
         }
-        if (player.isOp() && player.getItemInHand().getType().equals(Material.COMMAND)) {
+        if (player.isOp() && player.getItemInHand().getType().equals(TabooMenu.getInst().isNewAPI() ? Material.getMaterial("COMMAND_BLOCK") : Material.getMaterial("COMMAND"))) {
             player.sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of refresh items: " + (System.currentTimeMillis() - time) + "ms");
         }
     }

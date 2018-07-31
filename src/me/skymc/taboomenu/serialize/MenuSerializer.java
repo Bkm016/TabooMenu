@@ -88,7 +88,7 @@ public class MenuSerializer {
             }
 
             Map<String, Object> iconMap = configuration.getConfigurationSection(iconNode).getValues(false);
-            Icon icon = IconSerializer.loadIconFromMap(iconMap, iconNode, file.getName(), errors);
+            Icon icon = IconSerializer.loadIconFromMap(iconMap, iconNode, file.getName(), 0, errors);
 
             Integer x = null;
             Integer y = null;

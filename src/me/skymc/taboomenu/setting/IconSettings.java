@@ -168,6 +168,18 @@ public enum IconSettings {
     SKULL_TEXTURE("SKULL-TEXTURE"),
 
     /**
+     * 冷却时间
+     * 依赖插件:TabooLib
+     */
+    COOLDOWN("COOLDOWN"),
+
+    /**
+     * 冷却时间:提示
+     * 依赖插件:TabooLib
+     */
+    COOLDOWN_MESSAGE("COOLDOWN_MESSAGE"),
+
+    /**
      * 用于旧数据导入
      */
     DEPRECATED_DATA_VALUE("DATA-VALUE"),

@@ -1,6 +1,8 @@
 package me.skymc.taboomenu;
 
 import me.skymc.taboomenu.bstats.Metrics;
+import me.skymc.taboomenu.condition.IconCondition;
+import me.skymc.taboomenu.condition.impl.*;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.ScriptHandler;
@@ -19,6 +21,7 @@ import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +41,17 @@ public class TabooMenu extends JavaPlugin {
     private static TLogger tLogger;
     private static List<Menu> menus = new ArrayList<>();
     private YamlConfiguration config;
+    private boolean isNewAPI = false;
+
+    @Override
+    public void onLoad() {
+        try {
+            Material.getMaterial("PIG_SPAWN_EGG");
+            isNewAPI = true;
+        } catch (Exception ignored) {
+            isNewAPI = false;
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -52,6 +66,9 @@ public class TabooMenu extends JavaPlugin {
         }
         if (PlayerPointsBridge.setupPlayerPoints()) {
             tLogger.finest("Hooked PlayerPoints.");
+        }
+        if (isNewAPI) {
+            tLogger.finest("Support 1.13.");
         }
 
         ScriptHandler.inst();
@@ -68,6 +85,13 @@ public class TabooMenu extends JavaPlugin {
         if (!Bukkit.getMessenger().isOutgoingChannelRegistered(this, "BungeeCord")) {
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         }
+
+        IconCondition.registerCondition("Price", new ConditionPrice(), TabooMenu.getInst());
+        IconCondition.registerCondition("Points", new ConditionPoints(), TabooMenu.getInst());
+        IconCondition.registerCondition("Level", new ConditionLevel(), TabooMenu.getInst());
+        IconCondition.registerCondition("RequiredItems", new ConditionRequiredItems(), TabooMenu.getInst());
+        IconCondition.registerCondition("Permission", new ConditionPermission(), TabooMenu.getInst());
+        IconCondition.registerCondition("PermissionView", new ConditionPermissionView(), TabooMenu.getInst());
 
         new Metrics(inst);
         new PlaceholderHook(inst, "taboomenu").hook();
@@ -176,6 +200,10 @@ public class TabooMenu extends JavaPlugin {
 
     public static List<Menu> getMenus() {
         return menus;
+    }
+
+    public boolean isNewAPI() {
+        return isNewAPI;
     }
 
     @Override
