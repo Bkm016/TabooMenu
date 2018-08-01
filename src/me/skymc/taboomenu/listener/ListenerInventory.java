@@ -7,7 +7,6 @@ import me.skymc.taboomenu.display.data.ClickType;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.inventory.TemplateHolder;
 import me.skymc.taboomenu.template.TemplateManager;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -80,7 +79,7 @@ public class ListenerInventory implements Listener {
                     icon.onClick((Player) e.getWhoClicked(), e, ClickType.MIDDLE);
                 }
 
-                if (e.getWhoClicked().isOp() && e.getWhoClicked().getItemInHand().getType().equals(TabooMenu.getInst().isNewAPI() ? Material.getMaterial("COMMAND_BLOCK") : Material.getMaterial("COMMAND"))) {
+                if (e.getWhoClicked().isOp() && TabooMenu.getInst().getConfig().getBoolean("Settings.Debug")) {
                     e.getWhoClicked().sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of clicked items: " + (System.currentTimeMillis() - time) + "ms");
                 }
 

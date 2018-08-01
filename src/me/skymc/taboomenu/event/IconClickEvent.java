@@ -49,6 +49,10 @@ public class IconClickEvent extends PlayerEvent implements Cancellable {
         return icon;
     }
 
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
     public Menu getMenu() {
         return menu;
     }

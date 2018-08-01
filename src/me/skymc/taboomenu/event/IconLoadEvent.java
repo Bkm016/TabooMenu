@@ -4,6 +4,7 @@ import me.skymc.taboomenu.display.Icon;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,13 +19,15 @@ public class IconLoadEvent extends Event {
     private String fileName;
     private int requirementIndex;
     private Map<String, Object> section;
+    private List<String> errors;
 
-    public IconLoadEvent(Icon icon, String iconName, String fileName, int requirementIndex, Map<String, Object> section) {
+    public IconLoadEvent(Icon icon, String iconName, String fileName, int requirementIndex, Map<String, Object> section, List<String> errors) {
         this.icon = icon;
         this.iconName = iconName;
         this.fileName = fileName;
         this.section = section;
         this.requirementIndex = requirementIndex;
+        this.errors = errors;
     }
 
     @Override
@@ -57,6 +60,10 @@ public class IconLoadEvent extends Event {
 
     public int getRequirementIndex() {
         return requirementIndex;
+    }
+
+    public List<String> getErrors() {
+        return errors;
     }
 
     public static HandlerList getHandlerList() {

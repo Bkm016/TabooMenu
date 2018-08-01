@@ -6,28 +6,15 @@ import me.skymc.taboomenu.TabooMenuAPI;
 import me.skymc.taboomenu.condition.IconCondition;
 import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
-import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
-import me.skymc.taboomenu.support.TabooLibHook;
-import me.skymc.taboomenu.util.AttributeUtils;
-import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
-import me.skymc.taboomenu.util.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 import javax.script.CompiledScript;
 import javax.script.ScriptException;
@@ -83,10 +70,13 @@ public class Icon implements Cloneable {
     private String iconName;
     private int requirementIndex;
 
+    private Item item;
+
     public Icon(Material material, short data, int amount) {
         this.material = material;
         this.data = data;
         this.amount = amount;
+        this.item = new Item(this);
     }
 
     /**
@@ -108,17 +98,17 @@ public class Icon implements Cloneable {
      */
     public void onClick(Player player, InventoryClickEvent clickEvent, ClickType clickType) {
         Icon icon = getEffectiveIcon(player, clickType);
-        IconClickEvent event = new IconClickEvent(player, TabooMenuAPI.getPlayerCurrentMenu(player), this);
+        IconClickEvent event = new IconClickEvent(player, TabooMenuAPI.getPlayerCurrentMenu(player), icon);
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             return;
         }
-        if (IconCondition.getIconConditions().stream().anyMatch(condition -> !condition.check(player, clickEvent, clickType, this))) {
+        if (IconCondition.getIconConditions().stream().anyMatch(condition -> !condition.check(player, clickEvent, clickType, event.getIcon()))) {
             return;
         }
-        IconCondition.getIconConditions().forEach(condition -> condition.check(player, clickEvent, clickType, this));
-        executeClickAction(player, clickEvent, clickType, icon);
-        executeCommand(player, icon.iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
+        IconCondition.getIconConditions().forEach(iconCondition -> iconCondition.change(player, clickEvent, clickType, event.getIcon()));
+        executeClickAction(player, clickEvent, clickType, event.getIcon());
+        executeCommand(player, event.getIcon().iconCommands.stream().filter(iconCommand -> iconCommand.getClickType().contains(ClickType.ALL) || iconCommand.getClickType().contains(clickType)).collect(Collectors.toList()));
     }
 
     /**
@@ -148,7 +138,7 @@ public class Icon implements Cloneable {
      */
     public void executeClickAction(Player player, InventoryClickEvent clickEvent, ClickType clickType, Icon icon) {
         if (icon.getIconAction() != null && icon.getIconAction().getClickAction() != null) {
-            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name(), "clickEvent", clickEvent));
+            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name(), "clickEvent", clickEvent, "api", new InternalAPI(player, icon)));
             try {
                 if (icon.getIconAction().isClickPrecompile()) {
                     icon.getIconAction().getClickActionScript().eval(bindings);
@@ -170,7 +160,7 @@ public class Icon implements Cloneable {
      */
     public void executeViewAction(Player player, ItemStack itemStack, Icon icon) {
         if (icon.getIconAction() != null && icon.getIconAction().getViewAction() != null) {
-            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "viewItem", itemStack));
+            SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "viewItem", itemStack, "api", new InternalAPI(player, icon)));
             try {
                 if (icon.getIconAction().isViewPrecompile()) {
                     icon.getIconAction().getViewActionScript().eval(bindings);
@@ -194,8 +184,12 @@ public class Icon implements Cloneable {
         if (requirements.isEmpty()) {
             return this;
         }
-        SimpleBindings bindings = new SimpleBindings(ImmutableMap.of("player", player, "bukkit", Bukkit.getServer(), "clickType", clickType.name()));
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.put("player", player);
+        bindings.put("bukkit", Bukkit.getServer());
+        bindings.put("clickType", clickType.name());
         for (Requirement requirement : requirements) {
+            bindings.put("api", new InternalAPI(player, requirement.getIcon()));
             try {
                 Object result;
                 if (requirement.isPreCompile()) {
@@ -212,67 +206,6 @@ public class Icon implements Cloneable {
             }
         }
         return this;
-    }
-
-    /**
-     * 创建物品展示图标
-     *
-     * @param player 玩家
-     * @return {@link ItemStack}
-     */
-    public ItemStack createItemStack(Player player) {
-        if (material.equals(Material.AIR)) {
-            return new ItemStack(Material.AIR);
-        }
-
-        ItemStack itemStack = new ItemStack(material);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        if (!StringUtils.isBlank(skullTexture) && TabooLibHook.isTabooLibEnabled() && itemMeta instanceof SkullMeta) {
-            ItemStack finalItemStack = itemStack;
-            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(skullId, x -> TabooLibHook.setSkullTexture(finalItemStack, skullId, skullTexture));
-            itemMeta = itemStack.getItemMeta();
-        }
-
-        if (!StringUtils.isBlank(name)) {
-            itemMeta.setDisplayName(TranslateUtils.format(player, name));
-        }
-
-        if (!StringUtils.isBlank(skullOwner) && itemMeta instanceof SkullMeta) {
-            ((SkullMeta) itemMeta).setOwner(TranslateUtils.format(player, skullOwner));
-        }
-
-        if (!StringUtils.isBlank(eggType) && VersionUtils.getVersionNumber() >= 11100 && itemMeta instanceof SpawnEggMeta) {
-            formatSpawnEgg((SpawnEggMeta) itemMeta);
-        }
-
-        if (lore != null) {
-            itemMeta.setLore(TranslateUtils.format(player, lore));
-        }
-
-        if (color != null && itemMeta instanceof LeatherArmorMeta) {
-            ((LeatherArmorMeta) itemMeta).setColor(color);
-        }
-
-        if (potionType != null && VersionUtils.getVersionNumber() >= 10900 && itemMeta instanceof PotionMeta) {
-            formatPotion((PotionMeta) itemMeta);
-        }
-
-        if (bannerPatterns != null && VersionUtils.getVersionNumber() >= 10900 && itemMeta instanceof BannerMeta) {
-            formatBanner((BannerMeta) itemMeta);
-        }
-
-        itemStack.setItemMeta(itemMeta);
-        itemStack.setDurability(data);
-        itemStack.setAmount(amount);
-
-        if (shiny) {
-            itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-        }
-        if (hideAttribute) {
-            AttributeUtils.hideAttributes(itemStack);
-        }
-        return itemStack;
     }
 
     @Override
@@ -303,6 +236,7 @@ public class Icon implements Cloneable {
                 isFull() == icon.isFull() &&
                 isShiny() == icon.isShiny() &&
                 isHideAttribute() == icon.isHideAttribute() &&
+                getRequirementIndex() == icon.getRequirementIndex() &&
                 getMaterial() == icon.getMaterial() &&
                 Objects.equals(getName(), icon.getName()) &&
                 Objects.equals(getLore(), icon.getLore()) &&
@@ -320,12 +254,14 @@ public class Icon implements Cloneable {
                 Objects.equals(getSlotCopy(), icon.getSlotCopy()) &&
                 Objects.equals(getRequirements(), icon.getRequirements()) &&
                 Objects.equals(getIconCommands(), icon.getIconCommands()) &&
-                Objects.equals(getRequiredItems(), icon.getRequiredItems());
+                Objects.equals(getRequiredItems(), icon.getRequiredItems()) &&
+                Objects.equals(getMenuName(), icon.getMenuName()) &&
+                Objects.equals(getIconName(), icon.getIconName());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems());
+        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems(), getMenuName(), getIconName(), getRequirementIndex());
         result = 31 * result + Arrays.hashCode(getPotionType());
         return result;
     }
@@ -359,68 +295,10 @@ public class Icon implements Cloneable {
                 ", requirements=" + requirements +
                 ", iconCommands=" + iconCommands +
                 ", requiredItems=" + requiredItems +
+                ", menuName='" + menuName + '\'' +
+                ", iconName='" + iconName + '\'' +
+                ", requirementIndex=" + requirementIndex +
                 '}';
-    }
-
-    // *********************************
-    //
-    //         Private Methods
-    //
-    // *********************************
-
-    private void formatSpawnEgg(SpawnEggMeta itemMeta) {
-        try {
-            itemMeta.setSpawnedType(EntityType.valueOf(eggType));
-        } catch (Exception ignored) {
-            TabooMenu.getTLogger().error(eggType + " is an invalid entity type.");
-        }
-    }
-
-    private void formatBanner(BannerMeta itemMeta) {
-        for (String patternStr : bannerPatterns) {
-            String[] type = patternStr.split(" ");
-            if (type.length == 1) {
-                try {
-                    itemMeta.setBaseColor(DyeColor.valueOf(type[0].toUpperCase()));
-                } catch (Exception ignored) {
-                    itemMeta.setBaseColor(DyeColor.BLACK);
-                    TabooMenu.getTLogger().error(type[0] + " is an invalid color type.");
-                }
-            } else if (type.length == 2) {
-                try {
-                    itemMeta.addPattern(new Pattern(DyeColor.valueOf(type[0].toUpperCase()), PatternType.valueOf(type[1].toUpperCase())));
-                } catch (Exception e) {
-                    itemMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BASE));
-                    TabooMenu.getTLogger().error(eggType + " is an invalid banner type: " + e.toString());
-                }
-            }
-        }
-    }
-
-    private void formatPotion(PotionMeta itemMeta) {
-        try {
-            if (potionType.length < 2) {
-                itemMeta.setBasePotionData(new PotionData(PotionType.valueOf(potionType[0])));
-            } else if (potionType[1].equals("1")) {
-                itemMeta.setBasePotionData(new PotionData(PotionType.valueOf(potionType[0]), true, false));
-            } else if (potionType[1].equals("2")) {
-                itemMeta.setBasePotionData(new PotionData(PotionType.valueOf(potionType[0]), false, true));
-            } else {
-                TabooMenu.getTLogger().error(potionType[1] + " is an invalid value.");
-            }
-        } catch (Exception e) {
-            switch (e.getMessage()) {
-                case "Potion Type is not upgradable":
-                    TabooMenu.getTLogger().error(potionType[0] + " is not a upgradable potion.");
-                    break;
-                case "Potion Type is not extendable":
-                    TabooMenu.getTLogger().error(potionType[0] + " is not a extendable potion.");
-                    break;
-                default:
-                    TabooMenu.getTLogger().error(potionType[0] + " is an invalid potion type.");
-                    break;
-            }
-        }
     }
 
     // *********************************
@@ -660,5 +538,17 @@ public class Icon implements Cloneable {
 
     public void setRequirementIndex(int requirementIndex) {
         this.requirementIndex = requirementIndex;
+    }
+
+    public String getIndex() {
+        return menuName.replace(".yml", "") + "," + iconName + "," + requirementIndex;
+    }
+
+    public String getIndexNoRequirement() {
+        return menuName.replace(".yml", "") + "," + iconName;
+    }
+
+    public Item getItem() {
+        return item;
     }
 }

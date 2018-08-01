@@ -45,6 +45,10 @@ public class IconSerializer {
             }
         }
 
+        icon.setIconName(iconName);
+        icon.setMenuName(fileName);
+        icon.setRequirementIndex(requirementIndex);
+
         if (icon.getMaterial() == null) {
             getSimilarMaterial(material[0], icon);
         }
@@ -129,7 +133,7 @@ public class IconSerializer {
             loadRequirements(map, iconName, fileName, errors, icon);
         }
 
-        IconLoadEvent iconLoadEvent = new IconLoadEvent(icon, iconName, fileName, requirementIndex, map);
+        IconLoadEvent iconLoadEvent = new IconLoadEvent(icon, iconName, fileName, requirementIndex, map, errors);
         Bukkit.getPluginManager().callEvent(iconLoadEvent);
         return iconLoadEvent.getIcon();
     }
@@ -264,7 +268,7 @@ public class IconSerializer {
 
                 Icon requirementItem;
                 if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText())) {
-                    requirementItem = loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), requirementIcon, fileName, i, errors);
+                    requirementItem = loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), iconName, fileName, i, errors);
                 } else if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.COMMAND.getText())) {
                     requirementItem = (Icon) icon.clone();
                     if (requirementItem == null) {

@@ -92,6 +92,7 @@ public class TabooMenu extends JavaPlugin {
         IconCondition.registerCondition("RequiredItems", new ConditionRequiredItems(), TabooMenu.getInst());
         IconCondition.registerCondition("Permission", new ConditionPermission(), TabooMenu.getInst());
         IconCondition.registerCondition("PermissionView", new ConditionPermissionView(), TabooMenu.getInst());
+        IconCondition.registerCondition("Cooldown", new ConditionCooldown(), TabooMenu.getInst());
 
         new Metrics(inst);
         new PlaceholderHook(inst, "taboomenu").hook();

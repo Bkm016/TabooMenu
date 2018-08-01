@@ -174,10 +174,16 @@ public enum IconSettings {
     COOLDOWN("COOLDOWN"),
 
     /**
+     * 冷却时间:物品
+     * 依赖插件:TabooLib
+     */
+    COOLDOWN_ITEM("COOLDOWN-ITEM"),
+
+    /**
      * 冷却时间:提示
      * 依赖插件:TabooLib
      */
-    COOLDOWN_MESSAGE("COOLDOWN_MESSAGE"),
+    COOLDOWN_MESSAGE("COOLDOWN-MESSAGE"),
 
     /**
      * 用于旧数据导入

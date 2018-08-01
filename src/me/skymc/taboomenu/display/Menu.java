@@ -89,17 +89,17 @@ public class Menu {
             if (entry.getValue() == null || !entry.getValue().canIconView(player)) {
                 inventory.setItem(entry.getKey(), new ItemStack(Material.AIR));
             } else if (entry.getKey() < inventory.getSize()) {
-                IconViewEvent event = new IconViewEvent(player, this, entry.getValue());
+                Icon icon = entry.getValue().getEffectiveIcon(player, ClickType.VIEW);
+                IconViewEvent event = new IconViewEvent(player, this, icon);
                 Bukkit.getPluginManager().callEvent(event);
                 if (!event.isCancelled()) {
-                    Icon icon = entry.getValue().getEffectiveIcon(player, ClickType.VIEW);
-                    ItemStack itemStack = icon.createItemStack(player);
-                    icon.executeViewAction(player, itemStack, icon);
+                    ItemStack itemStack = event.getIcon().getItem().createItemStack(player);
+                    event.getIcon().executeViewAction(player, itemStack, event.getIcon());
                     inventory.setItem(entry.getKey(), itemStack);
                 }
             }
         }
-        if (player.isOp() && player.getItemInHand().getType().equals(TabooMenu.getInst().isNewAPI() ? Material.getMaterial("COMMAND_BLOCK") : Material.getMaterial("COMMAND"))) {
+        if (player.isOp() && TabooMenu.getInst().getConfig().getBoolean("Settings.Debug")) {
             player.sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of refresh items: " + (System.currentTimeMillis() - time) + "ms");
         }
     }
