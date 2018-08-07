@@ -95,7 +95,10 @@ public class TabooMenu extends JavaPlugin {
         IconCondition.registerCondition("Cooldown", new ConditionCooldown(), TabooMenu.getInst());
 
         new Metrics(inst);
-        new PlaceholderHook(inst, "taboomenu").hook();
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderHook(inst, "taboomenu").hook();
+        }
 
         new BukkitRunnable() {
 
