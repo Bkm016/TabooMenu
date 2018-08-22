@@ -12,7 +12,7 @@ import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
-import me.skymc.taboomenu.version.Material_v1_12;
+import me.skymc.taboomenu.version.MaterialUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -27,18 +27,14 @@ import java.util.*;
 public class IconSerializer {
 
     public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
-        String[] material = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().split(":");
-
+        String material = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase();
+        
         Icon icon;
         try {
-            if (TabooMenu.getInst().isNewAPI()) {
-                icon = new Icon(Material.getMaterial(Material_v1_12.getMaterial(Integer.valueOf(material[0])).name()), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
-            } else {
-                icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
-            }
+            icon = new Icon(MaterialUtils.getMaterial(material), MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
         } catch (Exception ignored) {
             try {
-                icon = new Icon(Material.getMaterial(material[0].replace(" ", "_")), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+                icon = new Icon(MaterialUtils.getMaterial(material.replace(" ", "_")), MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
             } catch (Exception e) {
                 icon = new Icon(Material.BEDROCK, (short) 0, 1);
                 errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: " + e.toString());
@@ -50,7 +46,7 @@ public class IconSerializer {
         icon.setRequirementIndex(requirementIndex);
 
         if (icon.getMaterial() == null) {
-            getSimilarMaterial(material[0], icon);
+            setSimilarMaterial(material, icon);
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.NAME.getText())) {
@@ -220,7 +216,7 @@ public class IconSerializer {
         return Color.fromRGB(red, green, blue);
     }
 
-    private static void getSimilarMaterial(String s, Icon icon) {
+    private static void setSimilarMaterial(String s, Icon icon) {
         String errorMaterial = s.replace(" ", "_");
         double degree = -1;
         double degreeLimit = TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit");
