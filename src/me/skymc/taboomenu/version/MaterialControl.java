@@ -864,8 +864,8 @@ public enum MaterialControl {
 
     private static int newV = -1;
     private static HashMap<String, MaterialControl> cachedSearch = new HashMap<>();
-    String m;
-    int data;
+    private String m;
+    private int data;
 
     MaterialControl(String m, int data) {
         this.m = m;
