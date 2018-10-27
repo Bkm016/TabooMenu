@@ -19,18 +19,8 @@
     <orderEntry type="library" name="PlayerPoints" level="application" />
     <orderEntry type="library" name="Vault" level="application" />
     <orderEntry type="library" name="PlaceholderAPI" level="application" />
-    <orderEntry type="library" name="TabooLib-Latest" level="application" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://D:/eclipse-library/Bukkit/1_12_R1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://D:/eclipse-library/Bukkit/1_12_R1.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="1_12_R1" level="application" />
     <orderEntry type="library" name="1_13_R1-b1770" level="application" />
+    <orderEntry type="library" name="TabooLib" level="application" />
   </component>
 </module>

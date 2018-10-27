@@ -1,5 +1,6 @@
 package me.skymc.taboomenu;
 
+import me.skymc.taboolib.string.ArrayUtils;
 import me.skymc.taboomenu.sound.SoundPack;
 import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.TranslateUtils;
@@ -10,10 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.NumberConversions;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -78,7 +76,7 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
         if (sender.hasPermission("taboomenu.command.help")) {
             sender.sendMessage("");
             sender.sendMessage("§7[TabooMenu] §fCommands:");
-            sender.sendMessage("§7[TabooMenu] §f/" + s + " open §7[§8MENU§7] §7[§8PLAYER§7] §7- §8Opens a menu for a player.");
+            sender.sendMessage("§7[TabooMenu] §f/" + s + " open §7<§8-op§7> §7[§8MENU§7] §7[§8PLAYER§7] §7- §8Opens a menu for a player.");
             sender.sendMessage("§7[TabooMenu] §f/" + s + " list §7- §8Lists the loaded menus.");
             sender.sendMessage("§7[TabooMenu] §f/" + s + " reload §7- §8Reloads the plugin.");
             sender.sendMessage("§7[TabooMenu] §f/" + s + " §7template§f create §7[§8MENU§7] §7<§8ROWS§7> §7[§8NAME§7] §7- §8Create a template.");
@@ -119,8 +117,16 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
     }
 
     void openCommand(CommandSender sender, String s, String[] args) {
+        boolean bypass = false;
+        if (args.length > 0 && args[0].equalsIgnoreCase("-op")) {
+            bypass = true;
+            List<String> list = ArrayUtils.asList(args);
+            list.remove(0);
+            args = list.toArray(new String[0]);
+        }
+
         if (args.length < 2) {
-            sender.sendMessage("§7[TabooMenu] §fUsage: /" + s + " open §8[MENU] [PLAYER]");
+            sender.sendMessage("§7[TabooMenu] §fUsage: /" + s + " open §7<§8-op§7> §8[MENU] [PLAYER]");
             return;
         }
 
@@ -143,7 +149,7 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("§7[TabooMenu] §4That player is not online.");
         } else {
             String menuName = (args[1].endsWith(".yml") ? args[1] : args[1] + ".yml").replace("__", " ");
-            TabooMenuAPI.MenuState menuState = TabooMenuAPI.openMenu(target, menuName, false);
+            TabooMenuAPI.MenuState menuState = TabooMenuAPI.openMenu(target, menuName, bypass);
             if (menuState == TabooMenuAPI.MenuState.MENU_NOT_FOUND) {
                 sender.sendMessage("§7[TabooMenu] §4The menu §c\"" + menuName + "\"§4 was not found.");
             }
@@ -231,5 +237,12 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
 
     private String arrayJoin(String[] args, int start) {
         return IntStream.range(start, args.length).mapToObj((i) -> args[i] + " ").collect(Collectors.joining()).trim();
+    }
+
+    @SafeVarargs
+    private final <T> List<T> asList(T... args) {
+        List<T> list = new ArrayList();
+        Collections.addAll(list, args);
+        return list;
     }
 }

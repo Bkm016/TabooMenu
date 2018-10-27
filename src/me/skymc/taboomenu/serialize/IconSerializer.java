@@ -9,10 +9,11 @@ import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.event.IconLoadEvent;
 import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.setting.IconSettings;
+import me.skymc.taboomenu.setting.SimilarDegreeMode;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
-import me.skymc.taboomenu.version.Material_v1_12;
+import me.skymc.taboomenu.version.MaterialControl;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -32,16 +33,16 @@ public class IconSerializer {
         Icon icon;
         try {
             if (TabooMenu.getInst().isNewAPI()) {
-                icon = new Icon(Material.getMaterial(Material_v1_12.getMaterial(Integer.valueOf(material[0])).name()), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+                icon = new Icon(MaterialControl.fromString(material[0]).parseMaterial(), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
             } else {
                 icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
             }
         } catch (Exception ignored) {
             try {
-                icon = new Icon(Material.getMaterial(material[0].replace(" ", "_")), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
+                icon = new Icon(MaterialControl.fromString(material[0].replace(" ", "_")).parseMaterial(), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
             } catch (Exception e) {
                 icon = new Icon(Material.BEDROCK, (short) 0, 1);
-                errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: " + e.toString());
+//                errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: " + e.toString());
             }
         }
 
@@ -228,18 +229,31 @@ public class IconSerializer {
             if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
                 degree = 1;
                 try {
-                    icon.setMaterial(Material.getMaterial(TabooMenu.getInst().getConfig().getString("Aliases." + alias)));
+                    icon.setMaterial(MaterialControl.fromString(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial());
                 } catch (Exception ignored) {
                 }
                 break;
             }
         }
         if (degree < degreeLimit) {
-            for (Material materialOther : Material.values()) {
-                double degreeNew = StringUtils.similarDegree(materialOther.name(), errorMaterial);
+            String[] materials;
+            SimilarDegreeMode similarDegreeMode = SimilarDegreeMode.fromString(TabooMenu.getInst().getConfig().getString("Settings.SimilarDegreeMode", "CURRENT_VERSION"));
+            switch (similarDegreeMode) {
+                case NEW_VERSION:
+                    materials = MaterialControl.collect(true);
+                    break;
+                case OLD_VERSION:
+                    materials = MaterialControl.collect(false);
+                    break;
+                default:
+                    materials = MaterialControl.collectCurrent();
+                    break;
+            }
+            for (String material : materials) {
+                double degreeNew = StringUtils.similarDegree(material, errorMaterial);
                 if (degreeNew > degree) {
                     degree = degreeNew;
-                    icon.setMaterial(materialOther);
+                    icon.setMaterial(MaterialControl.fromString(material).parseMaterial());
                 }
                 if (degree >= degreeLimit) {
                     break;

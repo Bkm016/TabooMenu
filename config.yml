@@ -9,6 +9,10 @@ Settings:
   DefaultColor:
     Name: '&f'
     Lore: '&7'
+  # CURRENT_VERSION = 当前版匹配
+  # OLD_VERSION = 老版本匹配
+  # NEW_VERSION = 新版本匹配
+  SimilarDegreeMode: CURRENT_VERSION
   SimilarDegreeLimit: 0.7
   AntiClickApamDelay: 200
   

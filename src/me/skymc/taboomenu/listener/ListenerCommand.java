@@ -21,8 +21,11 @@ public class ListenerCommand implements Listener {
         }
 
         String command = e.getMessage().substring(1);
-        Menu menu = TabooMenu.getMenus().stream().filter(x -> x.getOpenCommand().stream().anyMatch(command::equals)).findFirst().orElse(null);
+        if (command.isEmpty()) {
+            return;
+        }
 
+        Menu menu = TabooMenu.getMenus().stream().filter(x -> x.getOpenCommand().stream().anyMatch(command::equals)).findFirst().orElse(null);
         if (menu != null) {
             e.setCancelled(true);
             if (menu.isPermissionBypass() || e.getPlayer().hasPermission(menu.getPermission())) {
