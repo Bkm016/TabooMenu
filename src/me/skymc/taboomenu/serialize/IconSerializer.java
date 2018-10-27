@@ -51,7 +51,7 @@ public class IconSerializer {
         icon.setRequirementIndex(requirementIndex);
 
         if (icon.getMaterial() == null) {
-            getSimilarMaterial(material[0], icon);
+            setSimilarMaterial(material[0], icon);
         }
 
         if (MapUtils.containsIgnoreCase(map, IconSettings.NAME.getText())) {
@@ -221,7 +221,7 @@ public class IconSerializer {
         return Color.fromRGB(red, green, blue);
     }
 
-    private static void getSimilarMaterial(String s, Icon icon) {
+    private static void setSimilarMaterial(String s, Icon icon) {
         String errorMaterial = s.replace(" ", "_");
         double degree = -1;
         double degreeLimit = TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit");
