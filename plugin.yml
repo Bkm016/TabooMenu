@@ -8,4 +8,4 @@ softdepend: [Vault, PlayerPoints, PlaceholderAPI, TabooLib]
 
 commands:
   taboomenu:
-    aliases: [tmenu, cc]
+    aliases: [tmenu, tm, cc]

@@ -7,6 +7,7 @@ import me.skymc.taboomenu.condition.IconCondition;
 import me.skymc.taboomenu.display.data.*;
 import me.skymc.taboomenu.event.IconClickEvent;
 import me.skymc.taboomenu.handler.ScriptHandler;
+import me.skymc.taboomenu.handler.script.InternalAPI;
 import me.skymc.taboomenu.iconcommand.impl.IconCommandDelay;
 import me.skymc.taboomenu.util.TranslateUtils;
 import org.bukkit.Bukkit;

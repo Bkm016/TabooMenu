@@ -1,7 +1,5 @@
 package me.skymc.taboomenu.util;
 
-import com.google.common.base.Preconditions;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,17 +9,19 @@ import java.util.Map;
  */
 public class MapUtils {
 
-    public static boolean containsIgnoreCase(Map<?, ?> map, String key) {
-        return map.entrySet().stream().anyMatch(entry -> key.equalsIgnoreCase(String.valueOf(entry.getKey())));
+    public static boolean containsSimilar(Map<?, ?> map, String key) {
+        return map.entrySet().stream().anyMatch(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key));
     }
 
-    public static <T> T getOrDefaultIgnoreCase(Map<?, ?> map, String key, T def) {
-        Preconditions.checkNotNull(def, "Default value cannot be null.");
-        return map.entrySet().stream().filter(entry -> key.equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().map(entry -> (T) entry.getValue()).orElse(def);
+    public static Object getSimilar(Map<?, ?> map, String key) {
+        return map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst().map(Map.Entry::getValue).orElse(null);
+    }
+
+    public static <T> T getSimilarOrDefault(Map<?, ?> map, String key, T def) {
+        return map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst().map(entry -> (T) entry.getValue()).orElse(def);
     }
 
     public static <T> T getOrDefault(Map<?, ?> map, Object key, T def) {
-        Preconditions.checkNotNull(def, "Default value cannot be null.");
         if (map.containsKey(key)) {
             try {
                 return (T) map.get(key);

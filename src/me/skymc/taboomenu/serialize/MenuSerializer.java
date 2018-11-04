@@ -25,6 +25,8 @@ import java.util.stream.IntStream;
  */
 public class MenuSerializer {
 
+    private static final String MENU_SETTINGS = "menu-setting(s)?";
+
     public static Menu loadMenu(File file, List<String> errors) {
         Menu menu = new Menu(file);
         YamlConfiguration configuration = new YamlConfiguration();
@@ -57,16 +59,16 @@ public class MenuSerializer {
     }
 
     private static void loadMenuSettings(Menu menu, YamlConfiguration configuration) {
-        Object settingsObject = MapUtils.getOrDefaultIgnoreCase(configuration.getValues(false), "menu-settings", new Object());
+        Object settingsObject = MapUtils.getSimilarOrDefault(configuration.getValues(false), MENU_SETTINGS, new Object());
         Map settingsMap = getSettingsMap(settingsObject);
-        menu.setName(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.NAME.getText(), ""));
-        menu.setRows(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.ROWS.getText(), 1));
-        menu.setPrevious(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
-        menu.setAutoRefresh(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
-        menu.setPermissionBypass(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
-        Arrays.stream(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));
-        IconCommandSerializer.readCommands(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.OPEN_ACTION.getText(), "")).forEach(action -> menu.getOpenAction().add(action));
-        IconCommandSerializer.readCommands(MapUtils.getOrDefaultIgnoreCase(settingsMap, MenuSettings.CLOSE_ACTION.getText(), "")).forEach(action -> menu.getCloseAction().add(action));
+        menu.setName(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.NAME.getText(), ""));
+        menu.setRows(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.ROWS.getText(), 1));
+        menu.setPrevious(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
+        menu.setAutoRefresh(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
+        menu.setPermissionBypass(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
+        Arrays.stream(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));
+        IconCommandSerializer.readCommands(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.OPEN_ACTION.getText(), "")).forEach(action -> menu.getOpenAction().add(action));
+        IconCommandSerializer.readCommands(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.CLOSE_ACTION.getText(), "")).forEach(action -> menu.getCloseAction().add(action));
     }
 
     private static Map getSettingsMap(Object settingsObject) {
@@ -83,7 +85,7 @@ public class MenuSerializer {
 
     private static void loadMenuIcons(File file, List<String> errors, Menu menu, YamlConfiguration configuration) {
         for (String iconNode : configuration.getKeys(false)) {
-            if (iconNode.equalsIgnoreCase("menu-settings")) {
+            if (iconNode.matches(MENU_SETTINGS)) {
                 continue;
             }
 
@@ -93,11 +95,11 @@ public class MenuSerializer {
             Integer x = null;
             Integer y = null;
 
-            if (MapUtils.containsIgnoreCase(iconMap, IconSettings.DEPRECATED_POSITION_X.getText())) {
-                x = MapUtils.getOrDefaultIgnoreCase(iconMap, IconSettings.DEPRECATED_POSITION_X.getText(), 0);
+            if (MapUtils.containsSimilar(iconMap, IconSettings.DEPRECATED_POSITION_X.getText())) {
+                x = MapUtils.getSimilarOrDefault(iconMap, IconSettings.DEPRECATED_POSITION_X.getText(), 0);
             }
-            if (MapUtils.containsIgnoreCase(iconMap, IconSettings.DEPRECATED_POSITION_Y.getText())) {
-                y = MapUtils.getOrDefaultIgnoreCase(iconMap, IconSettings.DEPRECATED_POSITION_Y.getText(), 0);
+            if (MapUtils.containsSimilar(iconMap, IconSettings.DEPRECATED_POSITION_Y.getText())) {
+                y = MapUtils.getSimilarOrDefault(iconMap, IconSettings.DEPRECATED_POSITION_Y.getText(), 0);
             }
 
             if (isNumber(iconNode)) {

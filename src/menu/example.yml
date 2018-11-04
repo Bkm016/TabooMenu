@@ -23,12 +23,12 @@ menu-settings:
   # This command command will be execute when the menu is opened.
   # Supports all the icon command types.
   open-action: 'sound: BLOCK_CHEST_OPEN-1-1; tell: &eYou opened the example menu.'
-  
+
   # This command command will be execute when the menu is closed.
   # Supports all the icon command types.
   close-action: 'sound: BLOCK_CHEST_CLOSE-1-1; tell: &eYou closed the example menu.'
 
-  
+
 ######################
 #+                  +#
 #       ITEMS        #
@@ -43,7 +43,7 @@ menu-settings:
   - 'as the player who clicked.'
   command: 'spawn'
 
-  
+
 1:
   id: wool:1
   name: '&aWool with additional data'
@@ -53,7 +53,7 @@ menu-settings:
   amount: 1
   shiny: true
 
-  
+
 2:
   id: paper
   name: '&dFormatting codes'
@@ -66,7 +66,7 @@ menu-settings:
   - '&fUnderline (#n): &nexample'
   - '&fItalic (#o): &oexample'
 
-  
+
 3:
   id: command block
   name: '&cRuns command from the console.'
@@ -142,8 +142,8 @@ menu-settings:
   command: 'tell: &aYou have the correct permission!'
   permission: taboomenu.test
   permission-message: 'You don''t have the correct permission!'
-  
-  
+
+
 11:
   id: banner
   name: 'Banner patterns &8(1.9+)'
@@ -152,7 +152,16 @@ menu-settings:
   banner-pattern:
   - 'BLACK MOJANG'
   - 'WHITE'
-  
+
+12:
+  id: diamond
+  name: 'Give items'
+  lore:
+  - ''
+  - 'Give a diamond to player.'
+  command:
+  - 'give-item: diamond 1 name:&bDIAMOND!'
+
 26:
   name: '&6Close the menu'
   id: redstone lamp

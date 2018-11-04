@@ -185,7 +185,7 @@ public enum MaterialControl {
     COW_SPAWN_EGG("MONSTER_EGG", 0),
     CRACKED_STONE_BRICKS("SMOOTH_BRICK", 2),
     CRAFTING_TABLE("WORKBENCH", 0),
-    CREEPER_HEAD("SKULL", 0),
+    CREEPER_HEAD("SKULL_ITEM", 4),
     CREEPER_SPAWN_EGG("MONSTER_EGG", 0),
     CREEPER_WALL_HEAD("SKULL", 0),
     CUT_RED_SANDSTONE("STONE", 0),
@@ -252,7 +252,7 @@ public enum MaterialControl {
     DONKEY_SPAWN_EGG("MONSTER_EGG", 0),
     DRAGON_BREATH("DRAGONS_BREATH", 0),
     DRAGON_EGG("DRAGON_EGG", 0),
-    DRAGON_HEAD("SKULL", 5),
+    DRAGON_HEAD("SKULL_ITEM", 5),
     DRAGON_WALL_HEAD("SKULL", 0),
     DRIED_KELP("STONE", 0),
     DRIED_KELP_BLOCK("STONE", 0),
@@ -585,7 +585,7 @@ public enum MaterialControl {
     PINK_WOOL("WOOL", 6),
     PISTON("PISTON_BASE", 0),
     PISTON_HEAD("PISTON_EXTENSION", 0),
-    PLAYER_HEAD("SKULL", 0),
+    PLAYER_HEAD("SKULL_ITEM", 3),
     PLAYER_WALL_HEAD("SKULL", 0),
     PODZOL("DIRT", 2),
     POISONOUS_POTATO("POISONOUS_POTATO", 0),
@@ -717,7 +717,7 @@ public enum MaterialControl {
     SIGN("SIGN", 0),
     SILVERFISH_SPAWN_EGG("MONSTER_EGG", 0),
     SKELETON_HORSE_SPAWN_EGG("MONSTER_EGG", 0),
-    SKELETON_SKULL("SKULL", 0),
+    SKELETON_SKULL("SKULL_ITEM", 0),
     SKELETON_SPAWN_EGG("MONSTER_EGG", 0),
     SKELETON_WALL_SKULL("SKULL", 0),
     SLIME_BALL("SLIME_BALL", 0),
@@ -832,7 +832,7 @@ public enum MaterialControl {
     WHITE_WALL_BANNER("WALL_BANNER", 0),
     WHITE_WOOL("WOOL", 0),
     WITCH_SPAWN_EGG("MONSTER_EGG", 0),
-    WITHER_SKELETON_SKULL("SKULL", 0),
+    WITHER_SKELETON_SKULL("SKULL_ITEM", 1),
     WITHER_SKELETON_SPAWN_EGG("MONSTER_EGG", 0),
     WITHER_SKELETON_WALL_SKULL("SKULL", 0),
     WOLF_SPAWN_EGG("MONSTER_EGG", 0),
@@ -855,7 +855,7 @@ public enum MaterialControl {
     YELLOW_TERRACOTTA("STAINED_CLAY", 4),
     YELLOW_WALL_BANNER("WALL_BANNER", 0),
     YELLOW_WOOL("WOOL", 4),
-    ZOMBIE_HEAD("SKULL", 0),
+    ZOMBIE_HEAD("SKULL_ITEM", 2),
     ZOMBIE_HORSE_SPAWN_EGG("MONSTER_EGG", 0),
     ZOMBIE_PIGMAN_SPAWN_EGG("MONSTER_EGG", 0),
     ZOMBIE_SPAWN_EGG("MONSTER_EGG", 0),
@@ -904,7 +904,7 @@ public enum MaterialControl {
                 return mat;
             }
         }
-        return null;
+        return AIR;
     }
 
     public static MaterialControl fromString(String key) {

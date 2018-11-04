@@ -20,8 +20,8 @@ import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
+import me.skymc.taboomenu.version.MaterialControl;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -45,12 +45,7 @@ public class TabooMenu extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        try {
-            Material.getMaterial("PIG_SPAWN_EGG");
-            isNewAPI = true;
-        } catch (Exception ignored) {
-            isNewAPI = false;
-        }
+        isNewAPI = MaterialControl.isNewVersion();
     }
 
     @Override

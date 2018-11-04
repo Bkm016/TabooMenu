@@ -78,11 +78,11 @@ public class ConditionCooldown extends IconCondition implements Listener {
 
     @EventHandler
     public void onIconLoad(IconLoadEvent e) {
-        if (MapUtils.containsIgnoreCase(e.getSection(), IconSettings.COOLDOWN.getText())) {
-            if (MapUtils.containsIgnoreCase(e.getSection(), IconSettings.COOLDOWN_ITEM.getText())) {
-                iconCooldown.put(e.getIcon().getIndex(), new CooldownData(MapUtils.getOrDefaultIgnoreCase(e.getSection(), IconSettings.COOLDOWN.getText(), 0), MapUtils.getOrDefaultIgnoreCase(e.getSection(), IconSettings.COOLDOWN_MESSAGE.getText(), TranslateUtils.getMessage("in-cooldown")), IconSerializer.loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(e.getSection(), IconSettings.COOLDOWN_ITEM.getText(), ImmutableMap.of("", new Object())), e.getIconName() + "#CooldownIcon", e.getFileName(), e.getRequirementIndex(), e.getErrors())));
+        if (MapUtils.containsSimilar(e.getSection(), IconSettings.COOLDOWN.getText())) {
+            if (MapUtils.containsSimilar(e.getSection(), IconSettings.COOLDOWN_ITEM.getText())) {
+                iconCooldown.put(e.getIcon().getIndex(), new CooldownData(MapUtils.getSimilarOrDefault(e.getSection(), IconSettings.COOLDOWN.getText(), 0), MapUtils.getSimilarOrDefault(e.getSection(), IconSettings.COOLDOWN_MESSAGE.getText(), TranslateUtils.getMessage("in-cooldown")), IconSerializer.loadIconFromMap(MapUtils.getSimilarOrDefault(e.getSection(), IconSettings.COOLDOWN_ITEM.getText(), ImmutableMap.of("", new Object())), e.getIconName() + "#CooldownIcon", e.getFileName(), e.getRequirementIndex(), e.getErrors())));
             } else {
-                iconCooldown.put(e.getIcon().getIndex(), new CooldownData(MapUtils.getOrDefaultIgnoreCase(e.getSection(), IconSettings.COOLDOWN.getText(), 0), MapUtils.getOrDefaultIgnoreCase(e.getSection(), IconSettings.COOLDOWN_MESSAGE.getText(), TranslateUtils.getMessage("in-cooldown"))));
+                iconCooldown.put(e.getIcon().getIndex(), new CooldownData(MapUtils.getSimilarOrDefault(e.getSection(), IconSettings.COOLDOWN.getText(), 0), MapUtils.getSimilarOrDefault(e.getSection(), IconSettings.COOLDOWN_MESSAGE.getText(), TranslateUtils.getMessage("in-cooldown"))));
             }
         } else {
             iconCooldown.remove(e.getIcon().getIndex());

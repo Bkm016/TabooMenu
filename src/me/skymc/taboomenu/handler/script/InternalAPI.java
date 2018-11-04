@@ -1,6 +1,7 @@
-package me.skymc.taboomenu.display;
+package me.skymc.taboomenu.handler.script;
 
 import me.skymc.taboomenu.TabooMenuAPI;
+import me.skymc.taboomenu.display.Icon;
 import org.bukkit.entity.Player;
 
 /**

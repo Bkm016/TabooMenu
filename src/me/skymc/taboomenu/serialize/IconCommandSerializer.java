@@ -20,24 +20,25 @@ import java.util.stream.Collectors;
 public class IconCommandSerializer {
 
     private final static HashMap<Pattern, Class<? extends AbstractIconCommand>> commandTypes = new HashMap<>();
-    private final static Pattern changeFlag = Pattern.compile("<(?i)change:(.+)>");
+    private final static Pattern changeFlag = Pattern.compile("<(?i)(change|chance|rate):(.+)>");
 
     static {
         commandTypes.put(commandPattern("(tell|send|message):"), IconCommandMessage.class);
         commandTypes.put(commandPattern("broadcast:"), IconCommandBroadcast.class);
         commandTypes.put(commandPattern("console:"), IconCommandConsole.class);
         commandTypes.put(commandPattern("player:"), IconCommandPlayer.class);
-        commandTypes.put(commandPattern("server:"), IconCommandServer.class);
+        commandTypes.put(commandPattern("(server|connect):"), IconCommandServer.class);
         commandTypes.put(commandPattern("sound:"), IconCommandSound.class);
-        commandTypes.put(commandPattern("sound-broadcast:"), IconCommnadSoundBroadcast.class);
+        commandTypes.put(commandPattern("sound-(all|broadcast):"), IconCommnadSoundBroadcast.class);
         commandTypes.put(commandPattern("op:"), IconCommandOp.class);
         commandTypes.put(commandPattern("open:"), IconCommandOpen.class);
         commandTypes.put(commandPattern("open-force:"), IconCommandOpenForce.class);
-        commandTypes.put(commandPattern("delay:"), IconCommandDelay.class);
-        commandTypes.put(commandPattern("take-money:"), IconCommandTakeMoney.class);
-        commandTypes.put(commandPattern("give-money:"), IconCommandGiveMoney.class);
-        commandTypes.put(commandPattern("take-points:"), IconCommandTakePoints.class);
-        commandTypes.put(commandPattern("give-points:"), IconCommandGivePoints.class);
+        commandTypes.put(commandPattern("(delay|wait):"), IconCommandDelay.class);
+        commandTypes.put(commandPattern("(take|remove)-(money|balance):"), IconCommandTakeMoney.class);
+        commandTypes.put(commandPattern("(give|add)-(money|balance):"), IconCommandGiveMoney.class);
+        commandTypes.put(commandPattern("(take|remove)-point(s)?:"), IconCommandTakePoints.class);
+        commandTypes.put(commandPattern("(give|add)-point(s)?:"), IconCommandGivePoints.class);
+        commandTypes.put(commandPattern("(give-)?item:"), IconCommandGiveItem.class);
     }
 
     public static List<AbstractIconCommand> readCommands(String input) {
@@ -61,9 +62,9 @@ public class IconCommandSerializer {
                 iconCommands.add(readCommandsFully(commandObject.toString(), clickType.length == 0 ? new ClickType[] {ClickType.ALL} : clickType));
             } else if (commandObject instanceof Map) {
                 Map commandMap = (Map) commandObject;
-                if (MapUtils.containsIgnoreCase(commandMap, "list")) {
-                    ClickType[] clickTypes = Arrays.stream(MapUtils.getOrDefaultIgnoreCase(commandMap, "type", "ALL").split("\\|")).map(ClickType::getByName).toArray(ClickType[]::new);
-                    iconCommands.addAll(formatCommands(MapUtils.getOrDefaultIgnoreCase(commandMap, "list", new Object()), clickTypes));
+                if (MapUtils.containsSimilar(commandMap, "list|command(s)?")) {
+                    ClickType[] clickTypes = Arrays.stream(MapUtils.getSimilarOrDefault(commandMap, "(click-)?type", "ALL").split("\\|")).map(ClickType::getByName).toArray(ClickType[]::new);
+                    iconCommands.addAll(formatCommands(MapUtils.getSimilarOrDefault(commandMap, "list|command(s)?", new Object()), clickTypes));
                 }
             }
         }
@@ -71,9 +72,9 @@ public class IconCommandSerializer {
     }
 
     public static AbstractIconCommand matchCommand(String input) {
-        if (input.equalsIgnoreCase("close")) {
+        if (input.toLowerCase().matches("close(-menu)?")) {
             return new IconCommandClose(IconCommandClose.CloseType.CLOSE);
-        } else if (input.equalsIgnoreCase("previous")) {
+        } else if (input.toLowerCase().matches("previous(-menu)?")) {
             return new IconCommandClose(IconCommandClose.CloseType.PREVIOUS);
         }
         for (Map.Entry<Pattern, Class<? extends AbstractIconCommand>> entry : commandTypes.entrySet()) {

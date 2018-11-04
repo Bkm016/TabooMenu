@@ -2,6 +2,15 @@ package me.skymc.taboomenu.util;
 
 public class StringUtils {
 
+    public static boolean isInt(String var) {
+        try {
+            Integer.valueOf(var);
+            return true;
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
     public static boolean isBlank(String var) {
         return var == null || var.trim().isEmpty();
     }

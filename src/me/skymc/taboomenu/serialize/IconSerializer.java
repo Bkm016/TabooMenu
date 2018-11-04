@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.NumberConversions;
 
 import java.util.*;
 
@@ -27,110 +28,116 @@ import java.util.*;
  */
 public class IconSerializer {
 
-    public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
-        String[] material = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().split(":");
+    public static boolean isAir(Material material) {
+        return material == null || material == Material.AIR;
+    }
 
-        Icon icon;
-        try {
-            if (TabooMenu.getInst().isNewAPI()) {
-                icon = new Icon(MaterialControl.fromString(material[0]).parseMaterial(), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
-            } else {
-                icon = new Icon(Material.getMaterial(Integer.valueOf(material[0])), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
-            }
-        } catch (Exception ignored) {
-            try {
-                icon = new Icon(MaterialControl.fromString(material[0].replace(" ", "_")).parseMaterial(), material.length > 1 ? Short.valueOf(material[1]) : 0, MapUtils.getOrDefaultIgnoreCase(map, IconSettings.AMOUNT.getText(), 1));
-            } catch (Exception e) {
-                icon = new Icon(Material.BEDROCK, (short) 0, 1);
-//                errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid ID: " + e.toString());
+    public static Material getMaterial(String origin) {
+        Material material = TabooMenu.getInst().isNewAPI() || !StringUtils.isInt(origin) ? MaterialControl.fromString(origin).parseMaterial() : Material.getMaterial(Integer.valueOf(origin));
+        return isAir(material) ? getMaterialSimilar(origin) : material;
+    }
+
+    public static Material getMaterialSimilar(String s) {
+        String errorMaterial = s.replace(" ", "_");
+        for (String alias : TabooMenu.getInst().getConfig().getConfigurationSection("Aliases").getKeys(false)) {
+            if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
+                return MaterialControl.fromString(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial();
             }
         }
+        String[] materials;
+        switch (SimilarDegreeMode.fromString(TabooMenu.getInst().getConfig().getString("Settings.SimilarDegreeMode", "CURRENT_VERSION"))) {
+            case NEW_VERSION:
+                materials = MaterialControl.collect(true);
+                break;
+            case OLD_VERSION:
+                materials = MaterialControl.collect(false);
+                break;
+            default:
+                materials = MaterialControl.collectCurrent();
+                break;
+        }
+        return Arrays.stream(materials).filter(material -> StringUtils.similarDegree(material, errorMaterial) > TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit")).findFirst().map(material -> MaterialControl.fromString(material).parseMaterial()).orElse(Material.BEDROCK);
+    }
 
+    public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
+        String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().split(":");
+
+        Icon icon = new Icon(getMaterial(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
         icon.setIconName(iconName);
         icon.setMenuName(fileName);
         icon.setRequirementIndex(requirementIndex);
 
-        if (icon.getMaterial() == null) {
-            setSimilarMaterial(material[0], icon);
-        }
-
-        if (MapUtils.containsIgnoreCase(map, IconSettings.NAME.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.NAME.getText())) {
             loreItemName(map, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.LORE.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.LORE.getText())) {
             loadItemLore(map, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.BANNER_PATTERN.getText())) {
-            icon.setBannerPatterns(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.BANNER_PATTERN.getText(), Collections.emptyList()));
+        if (MapUtils.containsSimilar(map, IconSettings.BANNER_PATTERN.getText())) {
+            icon.setBannerPatterns(MapUtils.getSimilarOrDefault(map, IconSettings.BANNER_PATTERN.getText(), Collections.emptyList()));
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.POTION_TYPE.getText())) {
-            icon.setPotionType(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.POTION_TYPE.getText(), "").toUpperCase().split("-"));
+        if (MapUtils.containsSimilar(map, IconSettings.POTION_TYPE.getText())) {
+            icon.setPotionType(MapUtils.getSimilarOrDefault(map, IconSettings.POTION_TYPE.getText(), "").toUpperCase().split("-"));
         }
 
-        double price = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PRICE.getText(), 0).doubleValue();
+        double price = MapUtils.getSimilarOrDefault(map, IconSettings.PRICE.getText(), 0).doubleValue();
         if (price > 0.0) {
             icon.setPrice(price);
         } else if (price < 0.0) {
             errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative PRICE: " + price);
         }
 
-        int points = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.POINTS.getText(), 0);
+        int points = MapUtils.getSimilarOrDefault(map, IconSettings.POINTS.getText(), 0);
         if (points > 0.0) {
             icon.setPoints(points);
         } else if (points < 0.0) {
             errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative POINTS: " + points);
         }
 
-        int levels = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LEVELS.getText(), 0);
+        int levels = MapUtils.getSimilarOrDefault(map, IconSettings.LEVELS.getText(), 0);
         if (levels > 0.0) {
             icon.setLevels(levels);
         } else if (levels < 0.0) {
             errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative LEVELS: " + levels);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.COMMAND.getText())) {
-            icon.getIconCommands().addAll(IconCommandSerializer.formatCommands(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.COMMAND.getText(), new Object())));
+        if (MapUtils.containsSimilar(map, IconSettings.COMMAND.getText())) {
+            icon.getIconCommands().addAll(IconCommandSerializer.formatCommands(MapUtils.getSimilarOrDefault(map, IconSettings.COMMAND.getText(), new Object())));
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.SLOT_COPY.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.SLOT_COPY.getText())) {
             loadSlotCopy(map, iconName, fileName, errors, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIRED_ITEM.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.REQUIRED_ITEM.getText())) {
             loadRequiredItems(map, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.ACTION.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.ACTION.getText())) {
             loadIconAction(map, iconName, fileName, errors, icon);
         }
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.SKULL_TEXTURE.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.SKULL_TEXTURE.getText())) {
             loadSkullTexture(map, iconName, fileName, errors, icon);
         }
 
-        icon.setFull(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.FULL.getText(), false));
-        icon.setShiny(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SHINY.getText(), false));
-        icon.setColor(parseColor(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
-        icon.setEggType(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.EGG_TYPE.getText(), "").toUpperCase());
-        icon.setSkullOwner(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SKULL_OWNER.getText(), ""));
-        icon.setPermission(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION.getText(), ""));
-        icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_VIEW.getText(), ""));
-        icon.setPermissionMessage(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
-        icon.setHideAttribute(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
+        icon.setFull(MapUtils.getSimilarOrDefault(map, IconSettings.FULL.getText(), false));
+        icon.setShiny(MapUtils.getSimilarOrDefault(map, IconSettings.SHINY.getText(), false));
+        icon.setColor(parseColor(MapUtils.getSimilarOrDefault(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
+        icon.setEggType(MapUtils.getSimilarOrDefault(map, IconSettings.EGG_TYPE.getText(), "").toUpperCase());
+        icon.setSkullOwner(MapUtils.getSimilarOrDefault(map, IconSettings.SKULL_OWNER.getText(), ""));
+        icon.setPermission(MapUtils.getSimilarOrDefault(map, IconSettings.PERMISSION.getText(), ""));
+        icon.setPermissionView(MapUtils.getSimilarOrDefault(map, IconSettings.PERMISSION_VIEW.getText(), ""));
+        icon.setPermissionMessage(MapUtils.getSimilarOrDefault(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
+        icon.setHideAttribute(MapUtils.getSimilarOrDefault(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
 
-        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_ENCHANTMENT.getText())) {
-            icon.setShiny(true);
+        if (MapUtils.containsSimilar(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
+            icon.setData(MapUtils.getSimilarOrDefault(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
         }
-        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
-            icon.setData(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
-        }
-        if (MapUtils.containsIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText())) {
-            icon.setPermissionView(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.DEPRECATED_PERMISSION_VIEW.getText(), ""));
-        }
-        if (MapUtils.containsIgnoreCase(map, IconSettings.REQUIREMENT.getText())) {
+        if (MapUtils.containsSimilar(map, IconSettings.REQUIREMENT.getText())) {
             loadRequirements(map, iconName, fileName, errors, icon);
         }
 
@@ -146,14 +153,14 @@ public class IconSerializer {
     // *********************************
 
     private static void loreItemName(Map<String, Object> map, Icon icon) {
-        icon.setName(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.NAME.getText(), ""));
+        icon.setName(MapUtils.getSimilarOrDefault(map, IconSettings.NAME.getText(), ""));
         if (!(icon.getName().startsWith("&") || icon.getName().startsWith("§"))) {
             icon.setName(TabooMenu.getInst().getConfig().getString("Settings.DefaultColor.Name", "&f") + icon.getName());
         }
     }
 
     private static void loadItemLore(Map<String, Object> map, Icon icon) {
-        List<String> itemLore = new ArrayList<>(MapUtils.getOrDefaultIgnoreCase(map, IconSettings.LORE.getText(), Collections.emptyList()));
+        List<String> itemLore = new ArrayList<>(MapUtils.getSimilarOrDefault(map, IconSettings.LORE.getText(), Collections.emptyList()));
         for (int i = 0; i < itemLore.size(); i++) {
             String lore = itemLore.get(i);
             if (!(lore.startsWith("&") || lore.startsWith("§"))) {
@@ -164,7 +171,7 @@ public class IconSerializer {
     }
 
     private static void loadRequiredItems(Map<String, Object> map, Icon icon) {
-        Object requiredItemObject = map.entrySet().stream().filter(entry -> IconSettings.REQUIRED_ITEM.getText().equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().get().getValue();
+        Object requiredItemObject = MapUtils.getSimilar(map, IconSettings.REQUIRED_ITEM.getText());
         for (Object requiredItemOrigin : requiredItemObject instanceof List ? (List) requiredItemObject : Collections.singletonList(requiredItemObject)) {
             for (String requiredItemSource : requiredItemOrigin.toString().split(";")) {
                 icon.getRequiredItems().add(RequiredItem.valueOf(requiredItemSource));
@@ -173,7 +180,7 @@ public class IconSerializer {
     }
 
     private static void loadSlotCopy(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
-        Object slotObject = map.entrySet().stream().filter(entry -> IconSettings.SLOT_COPY.getText().equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().get().getValue();
+        Object slotObject = MapUtils.getSimilar(map, IconSettings.SLOT_COPY.getText());
         for (Object slotString : slotObject instanceof List ? (List) slotObject : Collections.singletonList(slotObject.toString())) {
             try {
                 icon.getSlotCopy().add(Integer.valueOf(slotString.toString()));
@@ -188,7 +195,7 @@ public class IconSerializer {
             errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: cannot found TabooLib");
             return;
         }
-        Object textureObject = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.SKULL_TEXTURE.getText(), new Object());
+        Object textureObject = MapUtils.getSimilarOrDefault(map, IconSettings.SKULL_TEXTURE.getText(), new Object());
         Map textureMap;
         if (textureObject instanceof ConfigurationSection) {
             textureMap = ((ConfigurationSection) textureObject).getValues(false);
@@ -198,8 +205,8 @@ public class IconSerializer {
             errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: not a Map");
             return;
         }
-        icon.setSkullId(MapUtils.getOrDefaultIgnoreCase(textureMap, "id", ""));
-        icon.setSkullTexture(MapUtils.getOrDefaultIgnoreCase(textureMap, "texture", ""));
+        icon.setSkullId(MapUtils.getSimilarOrDefault(textureMap, "id", ""));
+        icon.setSkullTexture(MapUtils.getSimilarOrDefault(textureMap, "texture", ""));
     }
 
     private static Color parseColor(String input, List<String> errors) {
@@ -221,49 +228,8 @@ public class IconSerializer {
         return Color.fromRGB(red, green, blue);
     }
 
-    private static void setSimilarMaterial(String s, Icon icon) {
-        String errorMaterial = s.replace(" ", "_");
-        double degree = -1;
-        double degreeLimit = TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit");
-        for (String alias : TabooMenu.getInst().getConfig().getConfigurationSection("Aliases").getKeys(false)) {
-            if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
-                degree = 1;
-                try {
-                    icon.setMaterial(MaterialControl.fromString(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial());
-                } catch (Exception ignored) {
-                }
-                break;
-            }
-        }
-        if (degree < degreeLimit) {
-            String[] materials;
-            SimilarDegreeMode similarDegreeMode = SimilarDegreeMode.fromString(TabooMenu.getInst().getConfig().getString("Settings.SimilarDegreeMode", "CURRENT_VERSION"));
-            switch (similarDegreeMode) {
-                case NEW_VERSION:
-                    materials = MaterialControl.collect(true);
-                    break;
-                case OLD_VERSION:
-                    materials = MaterialControl.collect(false);
-                    break;
-                default:
-                    materials = MaterialControl.collectCurrent();
-                    break;
-            }
-            for (String material : materials) {
-                double degreeNew = StringUtils.similarDegree(material, errorMaterial);
-                if (degreeNew > degree) {
-                    degree = degreeNew;
-                    icon.setMaterial(MaterialControl.fromString(material).parseMaterial());
-                }
-                if (degree >= degreeLimit) {
-                    break;
-                }
-            }
-        }
-    }
-
     private static void loadRequirements(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
-        Object requirementObject = map.entrySet().stream().filter(entry -> IconSettings.REQUIREMENT.getText().equalsIgnoreCase(String.valueOf(entry.getKey()))).findFirst().get().getValue();
+        Object requirementObject = MapUtils.getSimilar(map, IconSettings.REQUIREMENT.getText());
 
         int i = 0;
         for (Object requirementOrigin : requirementObject instanceof List ? (List) requirementObject : Collections.singletonList(requirementObject)) {
@@ -271,25 +237,25 @@ public class IconSerializer {
                 String requirementIcon = iconName + "$" + i++;
 
                 Map<String, Object> requirementMap = (Map<String, Object>) requirementOrigin;
-                if (!MapUtils.containsIgnoreCase(requirementMap, IconSettings.REQUIREMENT_EXPRESSION.getText())) {
+                if (!MapUtils.containsSimilar(requirementMap, IconSettings.REQUIREMENT_EXPRESSION.getText())) {
                     errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: EXPRESSION cannot be null.");
                     continue;
                 }
 
                 boolean preCompile = MapUtils.getOrDefault(requirementMap, IconSettings.REQUIREMENT_PRECOMPILE.getText(), false);
-                int requirementPriority = MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_PRIORITY.getText(), 0);
-                String requirementScript = MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_EXPRESSION.getText(), "");
+                int requirementPriority = MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_PRIORITY.getText(), 0);
+                String requirementScript = MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_EXPRESSION.getText(), "");
 
                 Icon requirementItem;
-                if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText())) {
-                    requirementItem = loadIconFromMap(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), iconName, fileName, i, errors);
-                } else if (MapUtils.containsIgnoreCase(requirementMap, IconSettings.COMMAND.getText())) {
+                if (MapUtils.containsSimilar(requirementMap, IconSettings.REQUIREMENT_ITEM.getText())) {
+                    requirementItem = loadIconFromMap(MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_ITEM.getText(), ImmutableMap.of("", new Object())), iconName, fileName, i, errors);
+                } else if (MapUtils.containsSimilar(requirementMap, IconSettings.COMMAND.getText())) {
                     requirementItem = (Icon) icon.clone();
                     if (requirementItem == null) {
                         errors.add("The icon \"" + requirementIcon + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: ITEM clone failed.");
                         continue;
                     }
-                    requirementItem.setIconCommands(IconCommandSerializer.formatCommands(MapUtils.getOrDefaultIgnoreCase(requirementMap, IconSettings.COMMAND.getText(), new Object())));
+                    requirementItem.setIconCommands(IconCommandSerializer.formatCommands(MapUtils.getSimilarOrDefault(requirementMap, IconSettings.COMMAND.getText(), new Object())));
                 } else {
                     errors.add("The icon \"" + requirementIcon + "\" in the menu \"" + fileName + "\" has an invalid REQUIREMENT: ITEM cannot be null.");
                     continue;
@@ -305,23 +271,23 @@ public class IconSerializer {
     }
 
     private static void loadIconAction(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
-        Object actionObject = MapUtils.getOrDefaultIgnoreCase(map, IconSettings.ACTION.getText(), new Object());
+        Object actionObject = MapUtils.getSimilarOrDefault(map, IconSettings.ACTION.getText(), new Object());
         if (actionObject instanceof Map) {
             IconAction iconAction = new IconAction();
             try {
                 Map<String, Object> actionMap = ((Map) actionObject);
-                if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText())) {
-                    String expression = MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW.getText(), "");
+                if (MapUtils.containsSimilar(actionMap, IconSettings.ACTION_VIEW.getText())) {
+                    String expression = MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_VIEW.getText(), "");
                     iconAction.setViewAction(expression);
-                    iconAction.setViewPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
+                    iconAction.setViewPrecompile(MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
                     if (iconAction.isViewPrecompile()) {
                         iconAction.setViewActionScript(ScriptHandler.compile(expression));
                     }
                 }
-                if (MapUtils.containsIgnoreCase(actionMap, IconSettings.ACTION_CLICK.getText())) {
-                    String expression = MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_CLICK.getText(), "");
+                if (MapUtils.containsSimilar(actionMap, IconSettings.ACTION_CLICK.getText())) {
+                    String expression = MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_CLICK.getText(), "");
                     iconAction.setClickAction(expression);
-                    iconAction.setClickPrecompile(MapUtils.getOrDefaultIgnoreCase(actionMap, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
+                    iconAction.setClickPrecompile(MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
                     if (iconAction.isClickPrecompile()) {
                         iconAction.setClickActionScript(ScriptHandler.compile(expression));
                     }

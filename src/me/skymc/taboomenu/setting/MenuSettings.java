@@ -9,42 +9,42 @@ public enum MenuSettings {
     /**
      * 菜单名称
      */
-    NAME("NAME"),
+    NAME("name|title|display"),
 
     /**
      * 菜单行数
      */
-    ROWS("ROWS"),
+    ROWS("row(s)?|line(s)?|size"),
 
     /**
      * 菜单命令
      */
-    COMMAND("COMMAND"),
+    COMMAND("(open-)?command(s)?"),
 
     /**
      * 上级菜单
      */
-    PREVIOUS("PREVIOUS"),
+    PREVIOUS("previous(-menu)?"),
 
     /**
      * 自动刷新
      */
-    AUTO_REFRESH("AUTO-REFRESH"),
+    AUTO_REFRESH("(auto-)?refresh"),
 
     /**
      * 菜单特效:开启
      */
-    OPEN_ACTION("OPEN-ACTION"),
+    OPEN_ACTION("open-action|action-open"),
 
     /**
      * 菜单特效:关闭
      */
-    CLOSE_ACTION("CLOSE-ACTION"),
+    CLOSE_ACTION("close-action|action-close"),
 
     /**
      * 是否跳过权限判断
      */
-    PERMISSION_BYPASS("PERMISSION-BYPASS");
+    PERMISSION_BYPASS("permission-bypass|no-permission");
 
     // *********************************
     //
