@@ -33,7 +33,14 @@ public class IconSerializer {
     }
 
     public static Material getMaterial(String origin) {
-        Material material = TabooMenu.getInst().isNewAPI() || !StringUtils.isInt(origin) ? MaterialControl.fromString(origin).parseMaterial() : Material.getMaterial(Integer.valueOf(origin));
+        Material material = null;
+        if (TabooMenu.getInst().isNewAPI()) {
+            material = MaterialControl.fromString(origin).parseMaterial();
+        } else if (!StringUtils.isInt(origin)) {
+            material = Material.getMaterial(origin);
+        } else {
+            Material.getMaterial(Integer.valueOf(origin));
+        }
         return isAir(material) ? getMaterialSimilar(origin) : material;
     }
 
@@ -60,7 +67,7 @@ public class IconSerializer {
     }
 
     public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
-        String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().split(":");
+        String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().replace(" ", "_").split(":");
 
         Icon icon = new Icon(getMaterial(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
         icon.setIconName(iconName);

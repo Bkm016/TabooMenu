@@ -109,10 +109,12 @@ public class RequiredItem {
                         damage = NumberConversions.toInt(data[1]);
                         break;
                     }
+                    case "isname":
                     case "hasname": {
                         hasName = StringUtils.toBooleanObject(data[1]);
                         break;
                     }
+                    case "islore":
                     case "haslore": {
                         hasLore = StringUtils.toBooleanObject(data[1]);
                         break;
