@@ -188,7 +188,7 @@ public enum IconSettings {
     /**
      * 用于旧数据导入
      */
-    DEPRECATED_DATA_VALUE("data(-value)?"),
+    DEPRECATED_DATA_VALUE("durability|damage|data(-value)?"),
     DEPRECATED_POSITION_X("(position-|location-)?x"),
     DEPRECATED_POSITION_Y("(position-|location-)?y");
 
