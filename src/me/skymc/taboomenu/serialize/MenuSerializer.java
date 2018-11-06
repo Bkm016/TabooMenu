@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
  */
 public class MenuSerializer {
 
-    private static final String MENU_SETTINGS = "menu-setting(s)?";
+    private static final String MENU_SETTINGS = "(menu-)?setting(s)?";
 
     public static Menu loadMenu(File file, List<String> errors) {
         Menu menu = new Menu(file);
