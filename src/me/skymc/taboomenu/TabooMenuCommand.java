@@ -107,7 +107,6 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
             long times = System.currentTimeMillis();
             List<String> errors = new ArrayList<>();
             TabooMenu.getInst().load(errors);
-
             if (!errors.isEmpty()) {
                 TranslateUtils.printErrors(sender, errors);
             } else {
@@ -118,18 +117,16 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
 
     void openCommand(CommandSender sender, String s, String[] args) {
         boolean bypass = false;
-        if (args.length > 0 && args[0].equalsIgnoreCase("-op")) {
+        if (args.length > 1 && args[1].equalsIgnoreCase("-op")) {
             bypass = true;
             List<String> list = ArrayUtils.asList(args);
             list.remove(0);
             args = list.toArray(new String[0]);
         }
-
         if (args.length < 2) {
             sender.sendMessage("§7[TabooMenu] §fUsage: /" + s + " open §7<§8-op§7> §8[MENU] [PLAYER]");
             return;
         }
-
         Player target;
         if (args.length > 2) {
             if (!sender.hasPermission("taboomenu.command.open.other")) {
@@ -144,7 +141,6 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage("§7[TabooMenu] §4You must specify a player from the console.");
             return;
         }
-
         if (target == null) {
             sender.sendMessage("§7[TabooMenu] §4That player is not online.");
         } else {

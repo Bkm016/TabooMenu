@@ -33,13 +33,13 @@ public class IconSerializer {
     }
 
     public static Material getMaterial(String origin) {
-        Material material = null;
+        Material material;
         if (TabooMenu.getInst().isNewAPI()) {
             material = MaterialControl.fromString(origin).parseMaterial();
         } else if (!StringUtils.isInt(origin)) {
             material = Material.getMaterial(origin);
         } else {
-            Material.getMaterial(Integer.valueOf(origin));
+            material = Material.getMaterial(Integer.valueOf(origin));
         }
         return isAir(material) ? getMaterialSimilar(origin) : material;
     }
