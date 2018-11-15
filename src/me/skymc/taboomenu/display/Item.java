@@ -86,8 +86,14 @@ public class Item {
         }
 
         itemStack.setItemMeta(itemMeta);
-        itemStack.setDurability(icon.getData());
-        itemStack.setAmount(icon.getAmount());
+
+        if (icon.getData() > 0) {
+            itemStack.setDurability(icon.getData());
+        }
+
+        if (icon.getAmount() > 0) {
+            itemStack.setAmount(icon.getAmount());
+        }
 
         if (icon.isShiny()) {
             itemStack.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
