@@ -186,6 +186,11 @@ public enum IconSettings {
     COOLDOWN_MESSAGE("cooldown-message"),
 
     /**
+     * 物品来源（模板）
+     */
+    ITEM_SOURCE("(item-)?source"),
+
+    /**
      * 用于旧数据导入
      */
     DEPRECATED_DATA_VALUE("durability|damage|data(-value)?"),

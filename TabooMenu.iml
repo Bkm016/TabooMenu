@@ -22,5 +22,14 @@
     <orderEntry type="library" name="1_12_R1" level="application" />
     <orderEntry type="library" name="1_13_R1-b1770" level="application" />
     <orderEntry type="library" name="TabooLib" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/org.codehaus.groovy-groovy-2.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

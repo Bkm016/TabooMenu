@@ -100,7 +100,7 @@ public class Menu {
             }
         }
         if (player.isOp() && TabooMenu.getInst().getConfig().getBoolean("Settings.Debug")) {
-            player.sendMessage("§7[TabooMenu §8Mirror§7]: §fThe calculation time of refresh items: " + (System.currentTimeMillis() - time) + "ms");
+            player.sendMessage("§7[TabooMenu] §fThe calculation time of refresh items: " + (System.currentTimeMillis() - time) + "ms");
         }
     }
 

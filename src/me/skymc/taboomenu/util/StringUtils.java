@@ -1,5 +1,9 @@
 package me.skymc.taboomenu.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class StringUtils {
 
     public static boolean isInt(String var) {
@@ -9,6 +13,13 @@ public class StringUtils {
         } catch (Exception ignored) {
         }
         return false;
+    }
+
+    @SafeVarargs
+    public static <T> List<T> asList(T... args) {
+        List<T> list = new ArrayList<>();
+        Collections.addAll(list, args);
+        return list;
     }
 
     public static boolean isBlank(String var) {

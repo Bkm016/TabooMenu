@@ -8,11 +8,14 @@ import me.skymc.taboomenu.display.data.RequiredItem;
 import me.skymc.taboomenu.display.data.Requirement;
 import me.skymc.taboomenu.event.IconLoadEvent;
 import me.skymc.taboomenu.handler.ScriptHandler;
+import me.skymc.taboomenu.handler.itemsource.ItemSource;
+import me.skymc.taboomenu.handler.itemsource.ItemSourceHandler;
 import me.skymc.taboomenu.setting.IconSettings;
 import me.skymc.taboomenu.setting.SimilarDegreeMode;
 import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
+import me.skymc.taboomenu.util.taboolib.ItemBuilder;
 import me.skymc.taboomenu.version.MaterialControl;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -131,6 +134,10 @@ public class IconSerializer {
             loadSkullTexture(map, iconName, fileName, errors, icon);
         }
 
+        if (MapUtils.containsSimilar(map, IconSettings.ITEM_SOURCE.getText())) {
+            loadItemSource(map, iconName, fileName, errors, icon);
+        }
+
         icon.setFull(MapUtils.getSimilarOrDefault(map, IconSettings.FULL.getText(), false));
         icon.setShiny(MapUtils.getSimilarOrDefault(map, IconSettings.SHINY.getText(), false));
         icon.setColor(parseColor(MapUtils.getSimilarOrDefault(map, IconSettings.COLOR.getText(), "0,0,0"), errors));
@@ -197,9 +204,24 @@ public class IconSerializer {
         }
     }
 
+    private static void loadItemSource(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
+        String[] source = MapUtils.getSimilarOrDefault(map, IconSettings.ITEM_SOURCE.getText(), "").split(":");
+        if (source.length == 1) {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid ITEM-SOURCE: Correct format \"SOURCE:INPUT\"");
+            icon.setItemSource(new ItemBuilder(Material.BEDROCK).name("&c* invalid ITEM-SOURCE *").build());
+        } else if (!ItemSourceHandler.getItemSources().containsKey(source[0])) {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid ITEM-SOURCE: " + source[0] + " not found");
+            icon.setItemSource(new ItemBuilder(Material.BEDROCK).name("&c* invalid ITEM-SOURCE *").build());
+        } else {
+            ItemSource itemSource = ItemSourceHandler.getItemSources().get(source[0]);
+            itemSource.refreshItem(source[1], errors);
+            icon.setItemSource(itemSource.getItem().containsKey(source[1]) ? itemSource.getItem().get(source[1]) : new ItemBuilder(Material.BEDROCK).name("&c* invalid ITEM-SOURCE *").build());
+        }
+    }
+
     private static void loadSkullTexture(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
         if (!TabooLibHook.isTabooLibEnabled()) {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: cannot found TabooLib");
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid SKULL-TEXTURE: cannot found TabooLib");
             return;
         }
         Object textureObject = MapUtils.getSimilarOrDefault(map, IconSettings.SKULL_TEXTURE.getText(), new Object());
@@ -209,7 +231,7 @@ public class IconSerializer {
         } else if (textureObject instanceof Map) {
             textureMap = (Map) textureObject;
         } else {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative SKULL-TEXTURE: not a Map");
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid SKULL-TEXTURE: not a Map");
             return;
         }
         icon.setSkullId(MapUtils.getSimilarOrDefault(textureMap, "id", ""));

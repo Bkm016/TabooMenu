@@ -1,6 +1,7 @@
 package me.skymc.taboomenu;
 
 import me.skymc.taboolib.string.ArrayUtils;
+import me.skymc.taboomenu.handler.itemsource.ItemSourceHandler;
 import me.skymc.taboomenu.sound.SoundPack;
 import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.TranslateUtils;
@@ -110,7 +111,7 @@ public class TabooMenuCommand implements CommandExecutor, TabCompleter {
             if (!errors.isEmpty()) {
                 TranslateUtils.printErrors(sender, errors);
             } else {
-                sender.sendMessage("§7[TabooMenu] §fLoaded " + TabooMenu.getMenus().size() + " menus. §8(" + (System.currentTimeMillis() - times) + "ms)");
+                sender.sendMessage("§7[TabooMenu] §fLoaded " + TabooMenu.getMenus().size() + " menus and " + ItemSourceHandler.getItemSources().size() + " sources. §8(" + (System.currentTimeMillis() - times) + "ms)");
             }
         }
     }

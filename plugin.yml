@@ -1,10 +1,10 @@
 name: TabooMenu
 main: me.skymc.taboomenu.TabooMenu
-version: 2.1
+version: 2.2
 api-version: 1.13
 
 author: [filoghost, 坏黑]
-softdepend: [Vault, PlayerPoints, PlaceholderAPI, TabooLib]
+softdepend: [Vault, PlayerPoints, PlaceholderAPI, TabooLib, TabooScript]
 
 commands:
   taboomenu:

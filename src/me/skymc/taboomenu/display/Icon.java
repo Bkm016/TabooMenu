@@ -71,6 +71,7 @@ public class Icon implements Cloneable {
     private String iconName;
     private int requirementIndex;
 
+    private ItemStack itemSource;
     private Item item;
 
     public Icon(Material material, short data, int amount) {
@@ -257,12 +258,14 @@ public class Icon implements Cloneable {
                 Objects.equals(getIconCommands(), icon.getIconCommands()) &&
                 Objects.equals(getRequiredItems(), icon.getRequiredItems()) &&
                 Objects.equals(getMenuName(), icon.getMenuName()) &&
-                Objects.equals(getIconName(), icon.getIconName());
+                Objects.equals(getIconName(), icon.getIconName()) &&
+                Objects.equals(getItemSource(), icon.getItemSource()) &&
+                Objects.equals(getItem(), icon.getItem());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems(), getMenuName(), getIconName(), getRequirementIndex());
+        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems(), getMenuName(), getIconName(), getRequirementIndex(), getItemSource(), getItem());
         result = 31 * result + Arrays.hashCode(getPotionType());
         return result;
     }
@@ -299,6 +302,8 @@ public class Icon implements Cloneable {
                 ", menuName='" + menuName + '\'' +
                 ", iconName='" + iconName + '\'' +
                 ", requirementIndex=" + requirementIndex +
+                ", itemSource=" + itemSource +
+                ", item=" + item +
                 '}';
     }
 
@@ -547,6 +552,14 @@ public class Icon implements Cloneable {
 
     public String getIndexNoRequirement() {
         return menuName.replace(".yml", "") + "," + iconName;
+    }
+
+    public ItemStack getItemSource() {
+        return itemSource;
+    }
+
+    public void setItemSource(ItemStack itemSource) {
+        this.itemSource = itemSource;
     }
 
     public Item getItem() {

@@ -6,6 +6,7 @@ import me.skymc.taboomenu.condition.impl.*;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.ScriptHandler;
+import me.skymc.taboomenu.handler.itemsource.ItemSourceHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.listener.ListenerCommand;
 import me.skymc.taboomenu.listener.ListenerInventory;
@@ -45,14 +46,13 @@ public class TabooMenu extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        inst = this;
+        tLogger = TLogger.getUnformatted(this);
         isNewAPI = MaterialControl.isNewVersion();
     }
 
     @Override
     public void onEnable() {
-        inst = this;
-        tLogger = TLogger.getUnformatted(this);
-
         if (TabooLibHook.setupTabooLib()) {
             tLogger.finest("Hooked TabooLib.");
         }
@@ -69,6 +69,7 @@ public class TabooMenu extends JavaPlugin {
         ScriptHandler.inst();
         AttributeUtils.setup();
         TemplateManager.init();
+        ItemSourceHandler.inst();
 
         Bukkit.getPluginCommand("taboomenu").setExecutor(new TabooMenuCommand());
         Bukkit.getPluginCommand("taboomenu").setTabCompleter(new TabooMenuCommand());
@@ -107,7 +108,7 @@ public class TabooMenu extends JavaPlugin {
                 if (!errors.isEmpty()) {
                     TranslateUtils.printErrors(errors);
                 } else {
-                    tLogger.info("Loaded " + menus.size() + " menus. (" + (System.currentTimeMillis() - times) + "ms)");
+                    tLogger.info("Loaded " + menus.size() + " menus and " + ItemSourceHandler.getItemSources().size() + " sources. §8(" + (System.currentTimeMillis() - times) + "ms)");
                 }
             }
         }.runTask(this);
@@ -141,6 +142,7 @@ public class TabooMenu extends JavaPlugin {
             }
         }
 
+        ItemSourceHandler.refresh();
         List<File> menuFiles = loadMenuFiles(menusFolder);
         for (File menuFile : menuFiles) {
             Menu menu = MenuSerializer.loadMenu(menuFile, errors);

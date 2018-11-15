@@ -32,11 +32,23 @@ public class Item {
     }
 
     public ItemStack createItemStack(Player player) {
-        if (icon.getMaterial().equals(Material.AIR)) {
+        if (icon.getMaterial() == Material.AIR && (icon.getItemSource() == null || icon.getItemSource().getType() == Material.AIR)) {
             return new ItemStack(Material.AIR);
         }
 
-        ItemStack itemStack = new ItemStack(icon.getMaterial());
+        ItemStack itemStack;
+        if (icon.getItemSource() != null) {
+            itemStack = icon.getItemSource().clone();
+            if (icon.getMaterial() != Material.AIR) {
+                itemStack.setType(icon.getMaterial());
+            }
+            if (itemStack.getType() == Material.AIR) {
+                return new ItemStack(Material.AIR);
+            }
+        } else {
+            itemStack = new ItemStack(icon.getMaterial());
+        }
+
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (!StringUtils.isBlank(icon.getSkullTexture()) && TabooLibHook.isTabooLibEnabled() && itemMeta instanceof SkullMeta) {
