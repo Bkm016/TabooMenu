@@ -38,7 +38,8 @@ public class IconCommandSerializer {
         commandTypes.put(commandPattern("(give|add)-(money|balance):"), IconCommandGiveMoney.class);
         commandTypes.put(commandPattern("(take|remove)-point(s)?:"), IconCommandTakePoints.class);
         commandTypes.put(commandPattern("(give|add)-point(s)?:"), IconCommandGivePoints.class);
-        commandTypes.put(commandPattern("(give-)?item:"), IconCommandGiveItem.class);
+        commandTypes.put(commandPattern("(give-)?item(s)?:"), IconCommandGiveItem.class);
+        commandTypes.put(commandPattern("(take|remove)-item(s)?:"), IconCommandTakeItems.class);
     }
 
     public static List<AbstractIconCommand> readCommands(String input) {

@@ -26,7 +26,11 @@ public class PlaceholderHook extends EZPlaceholderHook {
             return EconomyBridge.formatMoney(EconomyBridge.getMoney(player));
         }
         if (s.startsWith("required-item:")) {
-            return Arrays.stream(s.substring(s.indexOf(":") + 1).split(";")).map(item -> requiredItems.computeIfAbsent(item, x -> RequiredItem.valueOf(item))).anyMatch(requiredItem -> !requiredItem.hasItem(player)) ? "false" : "true";
+            return Arrays.stream(s.substring(s.indexOf(":") + 1).split(";")).map(item -> requiredItems.computeIfAbsent(item, x -> RequiredItem.valueOf(item))).allMatch(requiredItem -> requiredItem.hasItem(player)) ? "true" : "false";
+        }
+        if (s.startsWith("take-item:")) {
+            Arrays.stream(s.substring(s.indexOf(":") + 1).split(";")).map(item -> requiredItems.computeIfAbsent(item, x -> RequiredItem.valueOf(item))).forEach(requiredItem -> requiredItem.takeItem(player));
+            return "";
         }
         return "<ERROR>";
     }
