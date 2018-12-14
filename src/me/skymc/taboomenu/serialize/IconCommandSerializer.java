@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class IconCommandSerializer {
 
     private final static HashMap<Pattern, Class<? extends AbstractIconCommand>> commandTypes = new HashMap<>();
-    private final static Pattern changeFlag = Pattern.compile("<(?i)(change|chance|rate):(.+)>");
+    private final static Pattern chanceFlag = Pattern.compile("<(?i)(change|chance|rate):(.+)>");
 
     static {
         commandTypes.put(commandPattern("(tell|send|message):"), IconCommandMessage.class);
@@ -47,13 +47,14 @@ public class IconCommandSerializer {
     }
 
     public static IconCommand readCommandsFully(String input, ClickType[] clickType) {
-        double change = 1;
-        Matcher matcherChange = changeFlag.matcher(input);
+        // change 是我打错了！是chance！
+        double chance = 1;
+        Matcher matcherChange = chanceFlag.matcher(input);
         if (matcherChange.find()) {
             input = matcherChange.replaceFirst("").trim();
-            change = NumberConversions.toDouble(matcherChange.group(1).trim());
+            chance = NumberConversions.toDouble(matcherChange.group(2).trim());
         }
-        return new IconCommand(readCommands(input), change, clickType);
+        return new IconCommand(readCommands(input), chance, clickType);
     }
 
     public static List<IconCommand> formatCommands(Object commandOrigin, ClickType... clickType) {
@@ -106,7 +107,7 @@ public class IconCommandSerializer {
     //
     // *********************************
 
-    public static Pattern getChangeFlag() {
-        return changeFlag;
+    public static Pattern getChanceFlag() {
+        return chanceFlag;
     }
 }
