@@ -1,7 +1,12 @@
 package me.skymc.taboomenu.util;
 
+import com.google.common.collect.Maps;
+import me.skymc.taboomenu.TabooMenu;
+import org.bukkit.configuration.ConfigurationSection;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @Author sky
@@ -14,21 +19,19 @@ public class MapUtils {
     }
 
     public static Object getSimilar(Map<?, ?> map, String key) {
-        return map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst().map(Map.Entry::getValue).orElse(null);
+        Optional<? extends Map.Entry<?, ?>> find = map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst();
+        return find.map(entry -> entry.getValue() instanceof ConfigurationSection ? sectionToMap(entry.getValue()) : entry.getValue()).orElse(null);
     }
 
     public static <T> T getSimilarOrDefault(Map<?, ?> map, String key, T def) {
-        return map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst().map(entry -> (T) entry.getValue()).orElse(def);
-    }
-
-    public static <T> T getOrDefault(Map<?, ?> map, Object key, T def) {
-        if (map.containsKey(key)) {
-            try {
-                return (T) map.get(key);
-            } catch (Exception ignored) {
-            }
+        Optional<? extends Map.Entry<?, ?>> find = map.entrySet().stream().filter(entry -> String.valueOf(entry.getKey()).matches("^(?i)" + key)).findFirst();
+        if (!find.isPresent()) {
+            return def;
         }
-        return def;
+        if (find.get().getValue() instanceof ConfigurationSection && def instanceof Map) {
+            return (T) sectionToMap(find.get().getValue());
+        }
+        return (T) find.get().getValue();
     }
 
     public static Map instanceMap(Map map) {
@@ -36,6 +39,17 @@ public class MapUtils {
             return map.getClass().newInstance();
         } catch (Exception ignored) {
             return new HashMap<>();
+        }
+    }
+
+    public static Map sectionToMap(Object obj) {
+        if (obj instanceof Map) {
+            return (Map) obj;
+        } else if (obj instanceof ConfigurationSection) {
+            return ((ConfigurationSection) obj).getValues(false);
+        } else {
+            TabooMenu.getTLogger().info("Invalid Section type: " + obj.getClass().getName());
+            return Maps.newHashMap();
         }
     }
 }

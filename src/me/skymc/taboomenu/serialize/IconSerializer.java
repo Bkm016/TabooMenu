@@ -271,7 +271,7 @@ public class IconSerializer {
                     continue;
                 }
 
-                boolean preCompile = MapUtils.getOrDefault(requirementMap, IconSettings.REQUIREMENT_PRECOMPILE.getText(), false);
+                boolean preCompile = MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_PRECOMPILE.getText(), false);
                 int requirementPriority = MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_PRIORITY.getText(), 0);
                 String requirementScript = MapUtils.getSimilarOrDefault(requirementMap, IconSettings.REQUIREMENT_EXPRESSION.getText(), "");
 
