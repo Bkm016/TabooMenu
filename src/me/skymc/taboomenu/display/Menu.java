@@ -36,6 +36,7 @@ public class Menu {
     private int rows;
     private int autoRefresh;
     private boolean permissionBypass;
+    private boolean ignoreCancelled;
     private String previous;
     private List<String> openCommand = new ArrayList<>();
     private List<AbstractIconCommand> openAction = new ArrayList<>();
@@ -116,16 +117,19 @@ public class Menu {
         return getRows() == menu.getRows() &&
                 getAutoRefresh() == menu.getAutoRefresh() &&
                 isPermissionBypass() == menu.isPermissionBypass() &&
+                ignoreCancelled == menu.ignoreCancelled &&
                 Objects.equals(getFile(), menu.getFile()) &&
                 Objects.equals(getName(), menu.getName()) &&
+                Objects.equals(getPrevious(), menu.getPrevious()) &&
                 Objects.equals(getOpenCommand(), menu.getOpenCommand()) &&
                 Objects.equals(getOpenAction(), menu.getOpenAction()) &&
+                Objects.equals(getCloseAction(), menu.getCloseAction()) &&
                 Objects.equals(getIcons(), menu.getIcons());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getFile(), getName(), getRows(), getAutoRefresh(), isPermissionBypass(), getOpenCommand(), getOpenAction(), getIcons());
+        return Objects.hash(getFile(), getName(), getRows(), getAutoRefresh(), isPermissionBypass(), ignoreCancelled, getPrevious(), getOpenCommand(), getOpenAction(), getCloseAction(), getIcons());
     }
 
     // *********************************
@@ -196,5 +200,13 @@ public class Menu {
 
     public String getPermission() {
         return "taboomenu.open." + file.getName();
+    }
+
+    public boolean isIgnoreCancelled() {
+        return ignoreCancelled;
+    }
+
+    public void setIgnoreCancelled(boolean ignoreCancelled) {
+        this.ignoreCancelled = ignoreCancelled;
     }
 }

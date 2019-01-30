@@ -44,7 +44,12 @@ public enum MenuSettings {
     /**
      * 是否跳过权限判断
      */
-    PERMISSION_BYPASS("permission-bypass|no-permission");
+    PERMISSION_BYPASS("permission-bypass|no-permission"),
+
+    /**
+     * 是否跳过被取消的事件
+     */
+    IGNORE_CANCELLED("ignore-cancel(led)?");
 
     // *********************************
     //

@@ -40,14 +40,13 @@ public class ListenerInventory implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent e) {
-        if (e.isCancelled()) {
-            return;
-        }
         if (e.getInventory().getHolder() instanceof MenuHolder) {
-            e.setCancelled(true);
-
             MenuHolder menuHolder = (MenuHolder) e.getInventory().getHolder();
+            if (e.isCancelled() && menuHolder.getMenu().isIgnoreCancelled()) {
+                return;
+            }
             Icon icon = menuHolder.getMenu().getIcons().get(e.getRawSlot());
+            e.setCancelled(true);
 
             if (icon != null) {
                 int minDelay = TabooMenu.getInst().getConfig().getInt("Settings.AntiClickApamDelay");

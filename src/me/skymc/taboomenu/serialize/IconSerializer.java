@@ -300,33 +300,28 @@ public class IconSerializer {
     }
 
     private static void loadIconAction(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
-        Object actionObject = MapUtils.getSimilarOrDefault(map, IconSettings.ACTION.getText(), new Object());
-        if (actionObject instanceof Map) {
-            IconAction iconAction = new IconAction();
-            try {
-                Map<String, Object> actionMap = ((Map) actionObject);
-                if (MapUtils.containsSimilar(actionMap, IconSettings.ACTION_VIEW.getText())) {
-                    String expression = MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_VIEW.getText(), "");
-                    iconAction.setViewAction(expression);
-                    iconAction.setViewPrecompile(MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
-                    if (iconAction.isViewPrecompile()) {
-                        iconAction.setViewActionScript(ScriptHandler.compile(expression));
-                    }
+        Map value = MapUtils.sectionToMap(MapUtils.getSimilarOrDefault(map, IconSettings.ACTION.getText(), new Object()));
+        IconAction iconAction = new IconAction();
+        try {
+            if (MapUtils.containsSimilar(value, IconSettings.ACTION_VIEW.getText())) {
+                String expression = MapUtils.getSimilarOrDefault(value, IconSettings.ACTION_VIEW.getText(), "");
+                iconAction.setViewAction(expression);
+                iconAction.setViewPrecompile(MapUtils.getSimilarOrDefault(value, IconSettings.ACTION_VIEW_PRECOMPILE.getText(), false));
+                if (iconAction.isViewPrecompile()) {
+                    iconAction.setViewActionScript(ScriptHandler.compile(expression));
                 }
-                if (MapUtils.containsSimilar(actionMap, IconSettings.ACTION_CLICK.getText())) {
-                    String expression = MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_CLICK.getText(), "");
-                    iconAction.setClickAction(expression);
-                    iconAction.setClickPrecompile(MapUtils.getSimilarOrDefault(actionMap, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
-                    if (iconAction.isClickPrecompile()) {
-                        iconAction.setClickActionScript(ScriptHandler.compile(expression));
-                    }
-                }
-            } catch (Exception e) {
-                errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: " + e.toString());
             }
-            icon.setIconAction(iconAction);
-        } else {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: not a Map");
+            if (MapUtils.containsSimilar(value, IconSettings.ACTION_CLICK.getText())) {
+                String expression = MapUtils.getSimilarOrDefault(value, IconSettings.ACTION_CLICK.getText(), "");
+                iconAction.setClickAction(expression);
+                iconAction.setClickPrecompile(MapUtils.getSimilarOrDefault(value, IconSettings.ACTION_CLICK_PRECOMPILE.getText(), false));
+                if (iconAction.isClickPrecompile()) {
+                    iconAction.setClickActionScript(ScriptHandler.compile(expression));
+                }
+            }
+        } catch (Exception e) {
+            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a negative ACTION: " + e.toString());
         }
+        icon.setIconAction(iconAction);
     }
 }

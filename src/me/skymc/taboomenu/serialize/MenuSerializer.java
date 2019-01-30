@@ -66,6 +66,7 @@ public class MenuSerializer {
         menu.setPrevious(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.PREVIOUS.getText(), ""));
         menu.setAutoRefresh(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.AUTO_REFRESH.getText(), 0));
         menu.setPermissionBypass(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
+        menu.setIgnoreCancelled(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.PERMISSION_BYPASS.getText(), false));
         Arrays.stream(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.COMMAND.getText(), "").split(";")).forEach(command -> menu.getOpenCommand().add(command.trim()));
         IconCommandSerializer.readCommands(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.OPEN_ACTION.getText(), "")).forEach(action -> menu.getOpenAction().add(action));
         IconCommandSerializer.readCommands(MapUtils.getSimilarOrDefault(settingsMap, MenuSettings.CLOSE_ACTION.getText(), "")).forEach(action -> menu.getCloseAction().add(action));
