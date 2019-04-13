@@ -85,6 +85,17 @@ public class Item {
             formatBanner((BannerMeta) itemMeta);
         }
 
+        if (icon.isUnbreakable()) {
+            try {
+                itemMeta.setUnbreakable(true);
+            } catch (Throwable ignored) {
+            }
+            try {
+                itemMeta.spigot().setUnbreakable(true);
+            } catch (Throwable ignored) {
+            }
+        }
+
         itemStack.setItemMeta(itemMeta);
 
         if (icon.getData() > 0) {

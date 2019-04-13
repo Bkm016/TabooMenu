@@ -191,6 +191,11 @@ public enum IconSettings {
     ITEM_SOURCE("(item-)?source"),
 
     /**
+     * 无法破坏
+     */
+    UNBREAKABLE("unbreakable"),
+
+    /**
      * 用于旧数据导入
      */
     DEPRECATED_DATA_VALUE("durability|damage|data(-value)?"),

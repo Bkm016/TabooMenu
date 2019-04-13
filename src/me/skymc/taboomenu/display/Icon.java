@@ -56,6 +56,7 @@ public class Icon implements Cloneable {
     private boolean full;
     private boolean shiny;
     private boolean hideAttribute;
+    private boolean unbreakable;
 
     private IconAction iconAction;
 
@@ -238,6 +239,7 @@ public class Icon implements Cloneable {
                 isFull() == icon.isFull() &&
                 isShiny() == icon.isShiny() &&
                 isHideAttribute() == icon.isHideAttribute() &&
+                unbreakable == icon.unbreakable &&
                 getRequirementIndex() == icon.getRequirementIndex() &&
                 getMaterial() == icon.getMaterial() &&
                 Objects.equals(getName(), icon.getName()) &&
@@ -265,7 +267,7 @@ public class Icon implements Cloneable {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems(), getMenuName(), getIconName(), getRequirementIndex(), getItemSource(), getItem());
+        int result = Objects.hash(getMaterial(), getData(), getAmount(), getName(), getLore(), getBannerPatterns(), getColor(), getSkullOwner(), getSkullId(), getSkullTexture(), getPrice(), getPoints(), getLevels(), getPermission(), getPermissionMessage(), getPermissionView(), isFull(), isShiny(), isHideAttribute(), unbreakable, getIconAction(), getEggType(), getSlotCopy(), getRequirements(), getIconCommands(), getRequiredItems(), getMenuName(), getIconName(), getRequirementIndex(), getItemSource(), getItem());
         result = 31 * result + Arrays.hashCode(getPotionType());
         return result;
     }
@@ -292,6 +294,7 @@ public class Icon implements Cloneable {
                 ", full=" + full +
                 ", shiny=" + shiny +
                 ", hideAttribute=" + hideAttribute +
+                ", unbreakable=" + unbreakable +
                 ", iconAction=" + iconAction +
                 ", eggType='" + eggType + '\'' +
                 ", potionType=" + Arrays.toString(potionType) +
@@ -312,7 +315,6 @@ public class Icon implements Cloneable {
     //        Getter and Setter
     //
     // *********************************
-
 
     public Material getMaterial() {
         return material;
@@ -560,6 +562,14 @@ public class Icon implements Cloneable {
 
     public void setItemSource(ItemStack itemSource) {
         this.itemSource = itemSource;
+    }
+
+    public boolean isUnbreakable() {
+        return unbreakable;
+    }
+
+    public void setUnbreakable(boolean unbreakable) {
+        this.unbreakable = unbreakable;
     }
 
     public Item getItem() {

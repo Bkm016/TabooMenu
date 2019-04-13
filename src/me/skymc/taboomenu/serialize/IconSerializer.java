@@ -147,6 +147,7 @@ public class IconSerializer {
         icon.setPermissionView(MapUtils.getSimilarOrDefault(map, IconSettings.PERMISSION_VIEW.getText(), ""));
         icon.setPermissionMessage(MapUtils.getSimilarOrDefault(map, IconSettings.PERMISSION_MESSAGE.getText(), ""));
         icon.setHideAttribute(MapUtils.getSimilarOrDefault(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
+        icon.setUnbreakable(MapUtils.getSimilarOrDefault(map, IconSettings.UNBREAKABLE.getText(), false));
 
         if (MapUtils.containsSimilar(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
             icon.setData(MapUtils.getSimilarOrDefault(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
