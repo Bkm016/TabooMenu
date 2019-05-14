@@ -62,6 +62,6 @@ public class IconCommandGiveItem extends AbstractIconCommand {
 
     @Override
     public void execute(Player player) {
-        player.getInventory().addItem(itemStack).values().forEach(item -> player.getWorld().dropItem(player.getLocation(), item));
+        player.getInventory().addItem(itemStack.clone()).values().forEach(item -> player.getWorld().dropItem(player.getLocation(), item));
     }
 }
