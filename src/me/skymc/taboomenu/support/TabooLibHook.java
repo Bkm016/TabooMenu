@@ -40,7 +40,7 @@ public class TabooLibHook {
     }
 
     public static ItemStack getCustomSkull(String skullTexture) {
-        ItemStack skull = new ItemStack(MaterialControl.parseMaterial("PLAYER_HEAD", (byte)0));
+        ItemStack skull = new ItemStack(MaterialControl.matchMaterialControl("PLAYER_HEAD").parseMaterial());
         return setSkullTexture(skull, null, skullTexture);
     }
 
