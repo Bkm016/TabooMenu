@@ -16,6 +16,7 @@ import me.skymc.taboomenu.serialize.MenuSerializer;
 import me.skymc.taboomenu.support.EconomyBridge;
 import me.skymc.taboomenu.support.PlaceholderHook;
 import me.skymc.taboomenu.support.PlayerPointsBridge;
+import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
@@ -42,7 +43,6 @@ public class TabooMenu extends JavaPlugin {
     private static List<Menu> menus = new ArrayList<>();
     private YamlConfiguration config;
     private boolean isNewAPI = false;
-    private boolean isTLibEnable = false;
 
     @Override
     public void onLoad() {
@@ -53,8 +53,7 @@ public class TabooMenu extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (Bukkit.getPluginManager().isPluginEnabled("TabooLib")) {
-            isTLibEnable = !isTLibEnable;
+        if (TabooLibHook.isTabooLibEnabled()) {
             tLogger.finest("Hooked TabooLib.");
         }
         if (EconomyBridge.setupEconomy()) {
@@ -206,10 +205,6 @@ public class TabooMenu extends JavaPlugin {
 
     public boolean isNewAPI() {
         return isNewAPI;
-    }
-
-    public boolean isTLibEnable() {
-        return isTLibEnable;
     }
 
     @Override

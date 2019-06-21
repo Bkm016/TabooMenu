@@ -30,7 +30,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -1115,18 +1118,6 @@ public enum MaterialControl {
     }
 
     /**
-     * Checks if the given material matches any of the legacy names.
-     *
-     * @param name the material name.
-     * @return true if it's a legacy name.
-     */
-    public static boolean containsLegacy(String name) {
-        String formatted = format(name);
-        return Arrays.stream(Arrays.stream(MaterialControl.VALUES).map(m -> m.legacy).toArray(String[]::new)).anyMatch(mat
-                -> parseLegacyVersionMaterialName(mat).equals(formatted));
-    }
-
-    /**
      * @see #matchMaterialControl(String, byte)
      */
     public static MaterialControl matchMaterialControl(Material material) {
@@ -1140,26 +1131,6 @@ public enum MaterialControl {
         // -1 Determines whether the item's data is unknown and only the name is given.
         // Checking if the item is damageable won't do anything as the data is not going to be checked in requestOldMaterial anyway.
         return matchMaterialControl(name, (byte) -1);
-    }
-
-    /**
-     * Parses the material name and data argument as a {@link Material}.
-     *
-     * @param name name of the material
-     * @param data data of the material
-     */
-    public static Material parseMaterial(String name, byte data) {
-        return matchMaterialControl(name, data).parseMaterial();
-    }
-
-    /**
-     * @param item the ItemStack to match its material and data.
-     * @see #matchMaterialControl(String, byte)
-     */
-    @SuppressWarnings("deprecation")
-    public static MaterialControl matchMaterialControl(ItemStack item) {
-        return isDamageable(item.getType().name()) ? matchMaterialControl(item.getType().name(), (byte) 0) :
-                matchMaterialControl(item.getType().name(), (byte) item.getDurability());
     }
 
     /**
@@ -1206,40 +1177,6 @@ public enum MaterialControl {
     private static MaterialControl requestDuplicatedMaterialControl(String name, byte data) {
         MaterialControl mat = requestOldMaterialControl(name, data);
         return mat == null ? null : mat.name().endsWith("S") ? valueOf(name) : mat;
-    }
-
-    /**
-     * Always returns the value.
-     *
-     * @param name the name of the material.
-     * @return the new MaterialControl of this duplicated material.
-     * @see #getMaterialControlIfDuplicated(String)
-     */
-    public static MaterialControl getNewMaterialControlIfDuplicated(String name) {
-        return DUPLICATED.entrySet().stream()
-                .filter(m -> m.getKey().name().equals(format(name)))
-                .findFirst()
-                .map(Map.Entry::getValue)
-                .orElse(null);
-    }
-
-    /**
-     * Checks if the item is duplicated for a different purpose in new versions from {@link #DUPLICATED}.
-     *
-     * @param name the name of the material.
-     * @return the other MaterialControl (key or value) of the MaterialControl (key or value) which the name was equals to.
-     * @see #matchMaterialControl(String, byte)
-     */
-    public static MaterialControl getMaterialControlIfDuplicated(String name) {
-        String formatted = format(name);
-        Optional<Map.Entry<MaterialControl, MaterialControl>> mat = DUPLICATED.entrySet().stream().filter(m
-                -> m.getKey().name().equals(formatted) || m.getValue().name().equals(formatted)).findFirst();
-
-        if (mat.isPresent()) {
-            Map.Entry<MaterialControl, MaterialControl> found = mat.get();
-            return formatted.equals(found.getKey().name()) ? found.getValue() : found.getKey();
-        }
-        return null;
     }
 
     /**
