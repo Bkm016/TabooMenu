@@ -34,7 +34,7 @@ public class MapUtils {
         return (T) find.get().getValue();
     }
 
-    public static Map instanceMap(Map map) {
+    public static Map<Object, Object> instanceMap(Map map) {
         try {
             return map.getClass().newInstance();
         } catch (Exception ignored) {

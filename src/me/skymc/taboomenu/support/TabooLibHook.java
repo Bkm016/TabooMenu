@@ -1,6 +1,7 @@
 package me.skymc.taboomenu.support;
 
 import me.skymc.taboolib.itemnbtapi.*;
+import me.skymc.taboomenu.version.MaterialControl;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,6 +39,11 @@ public class TabooLibHook {
         return nbtItem.getItem();
     }
 
+    public static ItemStack getCustomSkull(String skullTexture) {
+        ItemStack skull = new ItemStack(MaterialControl.parseMaterial("PLAYER_HEAD", (byte)0));
+        return setSkullTexture(skull, null, skullTexture);
+    }
+
     // *********************************
     //
     //        Getter and Setter
@@ -47,4 +53,5 @@ public class TabooLibHook {
     public static boolean isTabooLibEnabled() {
         return tabooLibEnabled;
     }
+
 }

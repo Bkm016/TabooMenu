@@ -109,6 +109,13 @@ public class MenuSerializer {
                 y = (slot / 9) + 1;
             }
 
+            if (icon.getSlotCopy().toArray().length>0){
+                int slot = (int) icon.getSlotCopy().toArray()[0];
+                icon.getSlotCopy().remove(slot);
+                x = (slot % 9) + 1;
+                y = (slot / 9) + 1;
+            }
+
             if (x == null || y == null) {
                 errors.add("The icon \"" + iconNode + "\" in the menu \"" + file.getName() + " is missing POSITION-X and/or POSITION-Y.");
                 continue;

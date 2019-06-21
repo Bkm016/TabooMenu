@@ -78,4 +78,5 @@ public class EconomyBridge {
     public static String formatMoney(double amount) {
         return hasValidEconomy() ? economy.format(amount) : Double.toString(amount);
     }
+
 }

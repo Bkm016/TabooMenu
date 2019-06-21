@@ -6,7 +6,6 @@ import me.skymc.taboomenu.condition.impl.ConditionCooldown;
 import me.skymc.taboomenu.display.Menu;
 import me.skymc.taboomenu.inventory.MenuHolder;
 import me.skymc.taboomenu.serialize.IconSerializer;
-import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.TranslateUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -68,7 +67,7 @@ public class TabooMenuAPI {
      * @return boolean
      */
     public static Boolean isCooldown(Player player, String index) {
-        if (!TabooLibHook.isTabooLibEnabled()) {
+        if (!TabooMenu.getInst().isTLibEnable()) {
             player.sendMessage(ChatColor.RED + "This command has a cooldown setting, but the plugin TabooLib was not found. For security, the command has been blocked. Please inform the staff.");
             return false;
         }

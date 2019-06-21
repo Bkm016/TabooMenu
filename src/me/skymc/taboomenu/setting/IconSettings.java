@@ -84,7 +84,7 @@ public enum IconSettings {
     /**
      * 坐标拷贝
      */
-    SLOT_COPY("(slot-)?copy"),
+    SLOT_COPY("(slot-)?copy|slot(s)?"),
 
     /**
      * 点击权限
@@ -163,7 +163,6 @@ public enum IconSettings {
 
     /**
      * 头颅皮肤
-     * 依赖插件:TabooLib
      */
     SKULL_TEXTURE("skull-texture"),
 

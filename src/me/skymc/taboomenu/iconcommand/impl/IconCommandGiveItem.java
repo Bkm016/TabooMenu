@@ -30,7 +30,7 @@ public class IconCommandGiveItem extends AbstractIconCommand {
         super(command);
         String[] data = command.split(" ");
         String[] material = data[0].split(":");
-        this.material = IconSerializer.getMaterial(material[0].toUpperCase());
+        this.material = IconSerializer.getMaterialSimilar(material[0].toUpperCase());
         this.data = material.length > 1 ? NumberConversions.toShort(material[1]) : 0;
         if (data.length > 1) {
             for (int i = 1; i < data.length; i++) {

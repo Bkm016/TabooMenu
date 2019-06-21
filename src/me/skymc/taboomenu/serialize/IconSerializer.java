@@ -35,23 +35,11 @@ public class IconSerializer {
         return material == null || material == Material.AIR;
     }
 
-    public static Material getMaterial(String origin) {
-        Material material;
-        if (TabooMenu.getInst().isNewAPI()) {
-            material = MaterialControl.fromString(origin).parseMaterial();
-        } else if (!StringUtils.isInt(origin)) {
-            material = Material.getMaterial(origin);
-        } else {
-            material = Material.getMaterial(Integer.valueOf(origin));
-        }
-        return isAir(material) ? getMaterialSimilar(origin) : material;
-    }
-
     public static Material getMaterialSimilar(String s) {
         String errorMaterial = s.replace(" ", "_");
         for (String alias : TabooMenu.getInst().getConfig().getConfigurationSection("Aliases").getKeys(false)) {
             if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
-                return MaterialControl.fromString(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial();
+                return MaterialControl.matchMaterialControl(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial();
             }
         }
         String[] materials;
@@ -66,13 +54,13 @@ public class IconSerializer {
                 materials = MaterialControl.collectCurrent();
                 break;
         }
-        return Arrays.stream(materials).filter(material -> StringUtils.similarDegree(material, errorMaterial) > TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit")).findFirst().map(material -> MaterialControl.fromString(material).parseMaterial()).orElse(Material.BEDROCK);
+        return Arrays.stream(materials).filter(material -> StringUtils.similarDegree(material, errorMaterial) > TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit")).findFirst().map(material -> MaterialControl.matchMaterialControl(material).parseMaterial()).orElse(Material.BEDROCK);
     }
 
     public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
         String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().replace(" ", "_").split(":");
 
-        Icon icon = new Icon(getMaterial(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
+        Icon icon = new Icon(getMaterialSimilar(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
         icon.setIconName(iconName);
         icon.setMenuName(fileName);
         icon.setRequirementIndex(requirementIndex);
@@ -187,7 +175,7 @@ public class IconSerializer {
 
     private static void loadRequiredItems(Map<String, Object> map, Icon icon) {
         Object requiredItemObject = MapUtils.getSimilar(map, IconSettings.REQUIRED_ITEM.getText());
-        for (Object requiredItemOrigin : requiredItemObject instanceof List ? (List) requiredItemObject : Collections.singletonList(requiredItemObject)) {
+        for (Object requiredItemOrigin : requiredItemObject instanceof List ? (List<Object>) requiredItemObject : Collections.singletonList(requiredItemObject)) {
             for (String requiredItemSource : requiredItemOrigin.toString().split(";")) {
                 icon.getRequiredItems().add(RequiredItem.valueOf(requiredItemSource));
             }
@@ -196,7 +184,7 @@ public class IconSerializer {
 
     private static void loadSlotCopy(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
         Object slotObject = MapUtils.getSimilar(map, IconSettings.SLOT_COPY.getText());
-        for (Object slotString : slotObject instanceof List ? (List) slotObject : Collections.singletonList(slotObject.toString())) {
+        for (Object slotString : slotObject instanceof List ? (List<String>) slotObject : Collections.singletonList(slotObject.toString())) {
             try {
                 icon.getSlotCopy().add(Integer.valueOf(slotString.toString()));
             } catch (Exception e) {

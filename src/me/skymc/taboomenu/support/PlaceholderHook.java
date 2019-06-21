@@ -1,9 +1,9 @@
 package me.skymc.taboomenu.support;
 
-import me.clip.placeholderapi.external.EZPlaceholderHook;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.display.data.RequiredItem;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,17 +12,13 @@ import java.util.HashMap;
  * @Author sky
  * @Since 2018-06-13 18:20
  */
-public class PlaceholderHook extends EZPlaceholderHook {
+public class PlaceholderHook extends PlaceholderExpansion {
 
     private HashMap<String, RequiredItem> requiredItems = new HashMap<>();
 
-    public PlaceholderHook(Plugin plugin, String identifier) {
-        super(plugin, identifier);
-    }
-
     @Override
     public String onPlaceholderRequest(Player player, String s) {
-        if (s.equals("money")) {
+        if ("money".equalsIgnoreCase(s)) {
             return EconomyBridge.formatMoney(EconomyBridge.getMoney(player));
         }
         if (s.startsWith("required-item:")) {
@@ -33,5 +29,20 @@ public class PlaceholderHook extends EZPlaceholderHook {
             return "";
         }
         return "<ERROR>";
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "taboomenu";
+    }
+
+    @Override
+    public String getAuthor() {
+        return "坏黑";
+    }
+
+    @Override
+    public String getVersion() {
+        return TabooMenu.getInst().getDescription().getVersion();
     }
 }

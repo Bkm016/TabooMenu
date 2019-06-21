@@ -45,16 +45,6 @@ public class ItemBuilder {
         this.itemMeta = itemStack.getItemMeta();
     }
 
-    public ItemBuilder(OfflinePlayer player) {
-        this(Material.SKULL_ITEM, 1, 3);
-        this.skullOwner(player.getName());
-    }
-
-    public ItemBuilder material(int id) {
-        itemStack.setType(Material.getMaterial(id));
-        return this;
-    }
-
     public ItemBuilder material(String material) {
         itemStack.setType(Material.getMaterial(material));
         return this;
