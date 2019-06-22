@@ -3,7 +3,6 @@ package me.skymc.taboomenu.condition.impl;
 import com.google.common.collect.ImmutableMap;
 import me.skymc.taboolib.database.PlayerDataManager;
 import me.skymc.taboolib.timeutil.TimeFormatter;
-import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.condition.IconCondition;
 import me.skymc.taboomenu.display.Icon;
 import me.skymc.taboomenu.display.data.ClickType;
@@ -12,6 +11,7 @@ import me.skymc.taboomenu.event.IconLoadEvent;
 import me.skymc.taboomenu.event.IconViewEvent;
 import me.skymc.taboomenu.serialize.IconSerializer;
 import me.skymc.taboomenu.setting.IconSettings;
+import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import org.bukkit.ChatColor;
@@ -33,7 +33,7 @@ public class ConditionCooldown extends IconCondition implements Listener {
     @Override
     public boolean check(Player player, InventoryClickEvent clickEvent, ClickType clickType, Icon icon) {
         if (iconCooldown.containsKey(icon.getIndex())) {
-            if (!TabooMenu.getInst().isTLibEnable()) {
+            if (!TabooLibHook.isTabooLibEnabled()) {
                 player.sendMessage(ChatColor.RED + "This command has a cooldown setting, but the plugin TabooLib was not found. For security, the command has been blocked. Please inform the staff.");
                 return false;
             }

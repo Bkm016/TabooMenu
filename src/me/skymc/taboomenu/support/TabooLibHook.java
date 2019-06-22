@@ -25,7 +25,7 @@ public class TabooLibHook {
         NBTCompound skullOwner = nbtItem.getCompound("SkullOwner");
         NBTCompound properties = skullOwner.getCompound("Properties");
         NBTList textures = properties.getList("textures", NBTType.NBTTagCompound);
-        return new String[] {skullOwner.getString("Id"), textures.getCompound(0).getString("Value")};
+        return new String[]{skullOwner.getString("Id"), textures.getCompound(0).getString("Value")};
     }
 
     public static ItemStack setSkullTexture(ItemStack itemStack, String id, String texture) {

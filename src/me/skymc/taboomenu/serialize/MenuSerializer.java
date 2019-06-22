@@ -109,7 +109,7 @@ public class MenuSerializer {
                 y = (slot / 9) + 1;
             }
 
-            if (icon.getSlotCopy().toArray().length>0){
+            if (icon.getSlotCopy().toArray().length > 0) {
                 int slot = (int) icon.getSlotCopy().toArray()[0];
                 icon.getSlotCopy().remove(slot);
                 x = (slot % 9) + 1;

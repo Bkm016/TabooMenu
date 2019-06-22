@@ -61,7 +61,7 @@ public class IconCommandSerializer {
         List<IconCommand> iconCommands = new ArrayList<>();
         for (Object commandObject : TranslateUtils.formatList(commandOrigin)) {
             if (commandObject instanceof String) {
-                iconCommands.add(readCommandsFully(commandObject.toString(), clickType.length == 0 ? new ClickType[] {ClickType.ALL} : clickType));
+                iconCommands.add(readCommandsFully(commandObject.toString(), clickType.length == 0 ? new ClickType[]{ClickType.ALL} : clickType));
             } else if (commandObject instanceof Map) {
                 Map commandMap = (Map) commandObject;
                 if (MapUtils.containsSimilar(commandMap, "list|command(s)?")) {

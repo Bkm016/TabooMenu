@@ -1249,7 +1249,8 @@ public enum MaterialControl {
      */
     public static String getExactMajorVersion(String version) {
         // getBukkitVersion()
-        if (version.contains("SNAPSHOT") || version.contains("-R")) version = version.substring(0, version.indexOf("-"));
+        if (version.contains("SNAPSHOT") || version.contains("-R"))
+            version = version.substring(0, version.indexOf("-"));
         // getVersion()
         if (version.contains("git")) version = version.substring(version.indexOf("MC:") + 4).replace(")", "");
         if (version.split(Pattern.quote(".")).length > 2) version = version.substring(0, version.lastIndexOf("."));
@@ -1265,7 +1266,8 @@ public enum MaterialControl {
      */
     private static MinecraftVersion valueOfVersion(String version) {
         version = getExactMajorVersion(version);
-        if (version.equals("1.10") || version.equals("1.11") || version.equals("1.12")) return MinecraftVersion.VERSION_1_9;
+        if (version.equals("1.10") || version.equals("1.11") || version.equals("1.12"))
+            return MinecraftVersion.VERSION_1_9;
         version = version.replace(".", "_");
         if (!version.startsWith("VERSION_")) version = "VERSION_" + version;
         String check = version;

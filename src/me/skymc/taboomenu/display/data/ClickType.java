@@ -19,7 +19,7 @@ public enum ClickType {
     DROP,
 
     CONTROL_DROP,
-    
+
     VIEW,
 
     ALL;
