@@ -6,12 +6,15 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
+/**
+ * @author sky
+ */
 public class BungeeUtils {
 
     public static void connect(Player player, String server) {
         try {
             if (server.length() == 0) {
-                player.sendMessage("Target server was \"\" (empty string) cannot connect to it.");
+                player.sendMessage("Target server was \"\" (empty string) cannot connect to it.");
                 return;
             }
 

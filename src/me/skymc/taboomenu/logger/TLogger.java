@@ -5,6 +5,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * @author sky
+ */
 public class TLogger {
 
     public static final int VERBOSE = 0;
@@ -93,4 +96,5 @@ public class TLogger {
     public static TLogger getUnformatted(Plugin plugin) {
         return new TLogger("§8[§3§l{0}§8][§r{1}§8] §f{2}", plugin, 0);
     }
+
 }

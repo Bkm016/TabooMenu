@@ -18,4 +18,5 @@ public class IconCommandOpenForce extends AbstractIconCommand {
     public void execute(Player player) {
         TabooMenuAPI.openMenu(player, command, true);
     }
+
 }

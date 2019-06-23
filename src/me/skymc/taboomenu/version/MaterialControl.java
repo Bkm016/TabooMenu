@@ -30,17 +30,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
+/*
+ * References
+ *
+ * * * GitHub: https://github.com/CryptoMorin/XMaterial/blob/master/XMaterial.java
+ * * Thread: https://www.spigotmc.org/threads/378136/
+ * https://minecraft.gamepedia.com/Java_Edition_data_values/Pre-flattening
+ * https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+ * http://docs.codelanx.com/Bukkit/1.8/org/bukkit/Material.html
+ * https://www.spigotmc.org/threads/1-8-to-1-13-itemstack-material-version-support.329630/
+ * https://minecraft-ids.grahamedgecombe.com/
+ * v1: https://pastebin.com/Fe65HZnN
+ * v2: 6/15/2019
+ */
+
 /**
- * @author CryptoMorin
+ * MaterialControl v2.2 - Data Values/Pre-flattening
+ * Supports 1.8-1.14
+ * 1.13 and above as priority.
  */
 public enum MaterialControl {
-
     ACACIA_BOAT(0, "BOAT_ACACIA"),
     ACACIA_BUTTON(0, "WOOD_BUTTON"),
     ACACIA_DOOR(0, "ACACIA_DOOR_ITEM"),
@@ -692,7 +704,7 @@ public enum MaterialControl {
     PINK_WOOL(6, "WOOL"),
     PISTON(0, "PISTON_BASE"),
     PISTON_HEAD(0, "PISTON_EXTENSION"),
-    PLAYER_HEAD(3, "SKULL", "SKULL_ITEM", "HEAD"),
+    PLAYER_HEAD(3, "SKULL", "SKULL_ITEM"),
     PLAYER_WALL_HEAD(3, "SKULL", "SKULL_ITEM"),
     PODZOL(2, "DIRT"),
     POISONOUS_POTATO(0, ""),
@@ -920,7 +932,7 @@ public enum MaterialControl {
     STRIPPED_SPRUCE_LOG(1, "LOG"),
     STRIPPED_SPRUCE_WOOD(1, "LOG"),
     STRUCTURE_BLOCK(0, ""),
-    STRUCTURE_VOID(0, "1.10", "BARRIER/1.9"),
+    STRUCTURE_VOID(0, "1.10", "BARRIER/1.9"), // Originally developers used barrier blocks for its purpose.
     SUGAR(0, ""),
     SUGAR_CANE(0, "SUGAR_CANE_BLOCK"),
     SUNFLOWER(0, "DOUBLE_PLANT"),
@@ -1051,16 +1063,6 @@ public enum MaterialControl {
         this.legacy = legacy;
     }
 
-    public static String[] collect(boolean newVersion) {
-        MaterialControl[] values = values();
-        return Arrays.stream(values).map(value -> newVersion ? value.name() : value.name()).toArray(String[]::new);
-    }
-
-    public static String[] collectCurrent() {
-        Material[] values = Material.values();
-        return Arrays.stream(values).map(Enum::name).toArray(String[]::new);
-    }
-
     /**
      * Checks if the version is 1.13 (Aquatic Update) or higher.
      *
@@ -1089,9 +1091,9 @@ public enum MaterialControl {
      * When using newer versions of Minecraft {@link #isNewVersion()} this helps
      * to find the old material name with its data using a cached search for optimization.
      *
-     * @see #matchMaterialControl(String, byte)
+     * @see #matchXMaterial(String, byte)
      */
-    private static MaterialControl requestOldMaterialControl(String name, byte data) {
+    private static MaterialControl requestOldXMaterial(String name, byte data) {
         MaterialControl cached = CACHED_SEARCH.get(name + "," + data);
 
         if (cached != null) return cached;
@@ -1118,19 +1120,51 @@ public enum MaterialControl {
     }
 
     /**
-     * @see #matchMaterialControl(String, byte)
+     * Checks if the given material matches any of the legacy names.
+     *
+     * @param name the material name.
+     * @return true if it's a legacy name.
      */
-    public static MaterialControl matchMaterialControl(Material material) {
-        return matchMaterialControl(material.name());
+    public static boolean containsLegacy(String name) {
+        String formatted = format(name);
+        return Arrays.stream(Arrays.stream(MaterialControl.VALUES).map(m -> m.legacy).toArray(String[]::new)).anyMatch(mat
+                -> parseLegacyVersionMaterialName(mat).equals(formatted));
     }
 
     /**
-     * @see #matchMaterialControl(String, byte)
+     * @see #matchXMaterial(String, byte)
      */
-    public static MaterialControl matchMaterialControl(String name) {
+    public static MaterialControl matchXMaterial(Material material) {
+        return matchXMaterial(material.name());
+    }
+
+    /**
+     * @see #matchXMaterial(String, byte)
+     */
+    public static MaterialControl matchXMaterial(String name) {
         // -1 Determines whether the item's data is unknown and only the name is given.
         // Checking if the item is damageable won't do anything as the data is not going to be checked in requestOldMaterial anyway.
-        return matchMaterialControl(name, (byte) -1);
+        return matchXMaterial(name, (byte) -1);
+    }
+
+    /**
+     * Parses the material name and data argument as a {@link Material}.
+     *
+     * @param name name of the material
+     * @param data data of the material
+     */
+    public static Material parseMaterial(String name, byte data) {
+        return matchXMaterial(name, data).parseMaterial();
+    }
+
+    /**
+     * @param item the ItemStack to match its material and data.
+     * @see #matchXMaterial(String, byte)
+     */
+    @SuppressWarnings("deprecation")
+    public static MaterialControl matchXMaterial(ItemStack item) {
+        return isDamageable(item.getType().name()) ? matchXMaterial(item.getType().name(), (byte) 0) :
+                matchXMaterial(item.getType().name(), (byte) item.getDurability());
     }
 
     /**
@@ -1140,7 +1174,7 @@ public enum MaterialControl {
      * @param data the data byte of the material
      * @return a MaterialControl from the enum (with the same legacy name and data if in older versions.)
      */
-    public static MaterialControl matchMaterialControl(String name, byte data) {
+    public static MaterialControl matchXMaterial(String name, byte data) {
         Validate.notEmpty(name, "Material name cannot be null or empty");
         name = format(name);
 
@@ -1149,9 +1183,9 @@ public enum MaterialControl {
 
         // TODO Temporary but works - Please find a more reasonable fix for duplicated materials.
         if (isDuplicated(name) && !isNewVersion())
-            return requestDuplicatedMaterialControl(name, data);
+            return requestDuplicatedXMaterial(name, data);
 
-        return requestOldMaterialControl(name, data);
+        return requestOldXMaterial(name, data);
     }
 
     /**
@@ -1162,7 +1196,7 @@ public enum MaterialControl {
      * @param data the data of the material.
      * @return some MaterialControl, or null.
      */
-    public static MaterialControl matchMaterialControl(int id, byte data) {
+    public static MaterialControl matchXMaterial(int id, byte data) {
         // Looping through Material.values() will take longer.
         return Arrays.stream(MaterialControl.VALUES).filter(mat -> mat.getId() == id && mat.data == data).findFirst().orElse(null);
     }
@@ -1174,9 +1208,43 @@ public enum MaterialControl {
      * @param name the name of the material.
      * @return the duplicated MaterialControl based on the version.
      */
-    private static MaterialControl requestDuplicatedMaterialControl(String name, byte data) {
-        MaterialControl mat = requestOldMaterialControl(name, data);
+    private static MaterialControl requestDuplicatedXMaterial(String name, byte data) {
+        MaterialControl mat = requestOldXMaterial(name, data);
         return mat == null ? null : mat.name().endsWith("S") ? valueOf(name) : mat;
+    }
+
+    /**
+     * Always returns the value.
+     *
+     * @param name the name of the material.
+     * @return the new MaterialControl of this duplicated material.
+     * @see #getXMaterialIfDuplicated(String)
+     */
+    public static MaterialControl getNewXMaterialIfDuplicated(String name) {
+        return DUPLICATED.entrySet().stream()
+                .filter(m -> m.getKey().name().equals(format(name)))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(null);
+    }
+
+    /**
+     * Checks if the item is duplicated for a different purpose in new versions from {@link #DUPLICATED}.
+     *
+     * @param name the name of the material.
+     * @return the other MaterialControl (key or value) of the MaterialControl (key or value) which the name was equals to.
+     * @see #matchXMaterial(String, byte)
+     */
+    public static MaterialControl getXMaterialIfDuplicated(String name) {
+        String formatted = format(name);
+        Optional<Map.Entry<MaterialControl, MaterialControl>> mat = DUPLICATED.entrySet().stream().filter(m
+                -> m.getKey().name().equals(formatted) || m.getValue().name().equals(formatted)).findFirst();
+
+        if (mat.isPresent()) {
+            Map.Entry<MaterialControl, MaterialControl> found = mat.get();
+            return formatted.equals(found.getKey().name()) ? found.getValue() : found.getKey();
+        }
+        return null;
     }
 
     /**
@@ -1317,6 +1385,26 @@ public enum MaterialControl {
     }
 
     /**
+     * Converts the material's name to a string with the first letter uppercase.
+     *
+     * @return a converted string.
+     */
+    public String toWord() {
+        return this.name().charAt(0) + this.name().substring(1).toLowerCase();
+    }
+
+    /**
+     * Checks if the item is duplicated for a different purpose in new versions from {@link #DUPLICATED}.
+     *
+     * @return true if the item's name is duplicated.
+     * @see #matchXMaterial(String, byte)
+     */
+    public MaterialControl getXMaterialIfDuplicated() {
+        Optional<Map.Entry<MaterialControl, MaterialControl>> mat = DUPLICATED.entrySet().stream().filter(m -> m.getKey() == this).findFirst();
+        return mat.map(Map.Entry::getValue).orElse(null);
+    }
+
+    /**
      * @return true if the item can be damaged.
      * @see #isDamageable(String)
      */
@@ -1333,6 +1421,15 @@ public enum MaterialControl {
      */
     public int getData() {
         return this.data;
+    }
+
+    /**
+     * Get a list of materials names that was previously used by older versions.
+     *
+     * @return a list of string of legacy material names.
+     */
+    public String[] getLegacy() {
+        return this.legacy;
     }
 
     /**
@@ -1370,7 +1467,7 @@ public enum MaterialControl {
      *
      * @param suggest Use a suggested material if the material is added in the new version.
      * @return the Material related to this MaterialControl based on the server version.
-     * @see #matchMaterialControl(String, byte)
+     * @see #matchXMaterial(String, byte)
      */
     public Material parseMaterial(boolean suggest) {
         Material newMat = Material.getMaterial(this.name());
@@ -1482,7 +1579,7 @@ public enum MaterialControl {
             String legacyName = this.legacy[i];
 
             if (legacyName.contains("/")) continue;
-            MaterialControl mat = matchMaterialControl(parseLegacyVersionMaterialName(legacyName), this.data);
+            MaterialControl mat = matchXMaterial(parseLegacyVersionMaterialName(legacyName), this.data);
             if (mat != null && this != mat) return mat;
         }
         return null;
@@ -1516,4 +1613,5 @@ public enum MaterialControl {
 
         public static final MinecraftVersion[] VALUES = MinecraftVersion.values();
     }
+
 }

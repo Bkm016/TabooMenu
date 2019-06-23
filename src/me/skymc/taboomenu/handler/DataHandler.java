@@ -15,6 +15,7 @@ public class DataHandler {
 
     private static HashMap<String, Boolean> ignoredPreviousPlayers = new HashMap<>();
     private static HashMap<String, ItemStack> textureSkulls = new HashMap<>();
+    private static HashMap<String, String> latestChatMessage = new HashMap<>();
 
     public static void ignoredPrevious(Player player) {
         ignoredPreviousPlayers.put(player.getName(), true);
@@ -34,4 +35,9 @@ public class DataHandler {
     public static HashMap<String, ItemStack> getTextureSkulls() {
         return textureSkulls;
     }
+
+    public static HashMap<String, String> getLatestChatMessage() {
+        return latestChatMessage;
+    }
+
 }

@@ -1,7 +1,7 @@
 package me.skymc.taboomenu.template;
 
 import com.google.common.collect.ImmutableMap;
-import me.skymc.taboomenu.support.TabooLibHook;
+import me.skymc.taboomenu.util.SkullUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
@@ -74,11 +74,12 @@ public class TemplateSerializer {
     private static void serializeSkullTexture(ItemStack item, SkullMeta itemMeta, Map<String, Object> map) {
         if (!StringUtils.isBlank(itemMeta.getOwner())) {
             map.put("skull-owner", itemMeta.getOwner());
-        } else if (TabooLibHook.isTabooLibEnabled()) {
-            String[] skullTexture = TabooLibHook.getSkullTexture(item);
+        } else {
+            String skullTexture = SkullUtils.getTexture(item);
             if (skullTexture != null) {
-                map.put("skull-texture", ImmutableMap.of("id", skullTexture[0], "texture", skullTexture[1]));
+                map.put("skull-texture", ImmutableMap.of("id", null, "texture", skullTexture));
             }
         }
     }
+
 }

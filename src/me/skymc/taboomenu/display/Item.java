@@ -2,11 +2,7 @@ package me.skymc.taboomenu.display;
 
 import me.skymc.taboomenu.TabooMenu;
 import me.skymc.taboomenu.handler.DataHandler;
-import me.skymc.taboomenu.support.TabooLibHook;
-import me.skymc.taboomenu.util.AttributeUtils;
-import me.skymc.taboomenu.util.StringUtils;
-import me.skymc.taboomenu.util.TranslateUtils;
-import me.skymc.taboomenu.util.VersionUtils;
+import me.skymc.taboomenu.util.*;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
@@ -51,9 +47,8 @@ public class Item {
 
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        if (!StringUtils.isBlank(icon.getSkullTexture()) && TabooLibHook.isTabooLibEnabled() && itemMeta instanceof SkullMeta) {
-            ItemStack finalItemStack = itemStack;
-            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(icon.getSkullId(), x -> TabooLibHook.setSkullTexture(finalItemStack, icon.getSkullId(), icon.getSkullTexture()));
+        if (!StringUtils.isBlank(icon.getSkullTexture()) && itemMeta instanceof SkullMeta) {
+            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(icon.getSkullTexture(), x -> SkullUtils.getTextureSkull(icon.getSkullTexture()));
             itemMeta = itemStack.getItemMeta();
         }
 

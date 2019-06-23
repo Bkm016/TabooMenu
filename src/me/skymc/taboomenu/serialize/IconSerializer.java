@@ -11,8 +11,6 @@ import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.handler.itemsource.ItemSource;
 import me.skymc.taboomenu.handler.itemsource.ItemSourceHandler;
 import me.skymc.taboomenu.setting.IconSettings;
-import me.skymc.taboomenu.setting.SimilarDegreeMode;
-import me.skymc.taboomenu.support.TabooLibHook;
 import me.skymc.taboomenu.util.MapUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.taboolib.ItemBuilder;
@@ -35,32 +33,38 @@ public class IconSerializer {
         return material == null || material == Material.AIR;
     }
 
+    public static Material getMaterial(String origin) {
+        Material material = null;
+        if (!StringUtils.isInt(origin)) {
+            try {
+                material = MaterialControl.matchXMaterial(origin).parseMaterial();
+            } catch (NullPointerException ignored) {
+            }
+        } else if (!MaterialControl.isNewVersion()) {
+            material = MaterialControl.matchXMaterial(Integer.valueOf(origin), (byte) 0).parseMaterial();
+        }
+        return isAir(material) ? getMaterialSimilar(origin) : material;
+    }
+
+
     public static Material getMaterialSimilar(String s) {
         String errorMaterial = s.replace(" ", "_");
         for (String alias : TabooMenu.getInst().getConfig().getConfigurationSection("Aliases").getKeys(false)) {
             if (alias.replace(" ", "_").equalsIgnoreCase(errorMaterial)) {
-                return MaterialControl.matchMaterialControl(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial();
+                return MaterialControl.matchXMaterial(TabooMenu.getInst().getConfig().getString("Aliases." + alias)).parseMaterial();
             }
         }
-        String[] materials;
-        switch (SimilarDegreeMode.fromString(TabooMenu.getInst().getConfig().getString("Settings.SimilarDegreeMode", "CURRENT_VERSION"))) {
-            case NEW_VERSION:
-                materials = MaterialControl.collect(true);
-                break;
-            case OLD_VERSION:
-                materials = MaterialControl.collect(false);
-                break;
-            default:
-                materials = MaterialControl.collectCurrent();
-                break;
-        }
-        return Arrays.stream(materials).filter(material -> StringUtils.similarDegree(material, errorMaterial) > TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit")).findFirst().map(material -> MaterialControl.matchMaterialControl(material).parseMaterial()).orElse(Material.BEDROCK);
+        return Arrays.stream(MaterialControl.VALUES)
+                .filter(x -> StringUtils.similarDegree(x.name(), errorMaterial) >= TabooMenu.getInst().getConfig().getDouble("Settings.SimilarDegreeLimit"))
+                .max(Comparator.comparingDouble(x -> StringUtils.similarDegree(x.name(), errorMaterial)))
+                .map(MaterialControl::parseMaterial)
+                .orElse(Material.BEDROCK);
     }
 
     public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
         String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().replace(" ", "_").split(":");
 
-        Icon icon = new Icon(getMaterialSimilar(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
+        Icon icon = new Icon(getMaterial(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
         icon.setIconName(iconName);
         icon.setMenuName(fileName);
         icon.setRequirementIndex(requirementIndex);
@@ -209,22 +213,21 @@ public class IconSerializer {
     }
 
     private static void loadSkullTexture(Map<String, Object> map, String iconName, String fileName, List<String> errors, Icon icon) {
-        if (!TabooLibHook.isTabooLibEnabled()) {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid SKULL-TEXTURE: cannot found TabooLib");
-            return;
-        }
         Object textureObject = MapUtils.getSimilarOrDefault(map, IconSettings.SKULL_TEXTURE.getText(), new Object());
-        Map textureMap;
+        Map textureMap = null;
+        String texture;
         if (textureObject instanceof ConfigurationSection) {
             textureMap = ((ConfigurationSection) textureObject).getValues(false);
+            texture = MapUtils.getSimilarOrDefault(textureMap, "texture", "");
         } else if (textureObject instanceof Map) {
             textureMap = (Map) textureObject;
+            texture = MapUtils.getSimilarOrDefault(textureMap, "texture", "");
         } else {
-            errors.add("The icon \"" + iconName + "\" in the menu \"" + fileName + "\" has a invalid SKULL-TEXTURE: not a Map");
-            return;
+            texture = String.valueOf(textureObject);
         }
-        icon.setSkullId(MapUtils.getSimilarOrDefault(textureMap, "id", ""));
-        icon.setSkullTexture(MapUtils.getSimilarOrDefault(textureMap, "texture", ""));
+
+        // icon.setSkullId(MapUtils.getSimilarOrDefault(textureMap, "id", ""));
+        icon.setSkullTexture(texture);
     }
 
     private static Color parseColor(String input, List<String> errors) {
@@ -250,7 +253,7 @@ public class IconSerializer {
         Object requirementObject = MapUtils.getSimilar(map, IconSettings.REQUIREMENT.getText());
 
         int i = 0;
-        for (Object requirementOrigin : requirementObject instanceof List ? (List) requirementObject : Collections.singletonList(requirementObject)) {
+        for (Object requirementOrigin : requirementObject instanceof List ? (List<Object>) requirementObject : Collections.singletonList(requirementObject)) {
             if (requirementOrigin instanceof Map) {
                 String requirementIcon = iconName + "$" + i++;
 

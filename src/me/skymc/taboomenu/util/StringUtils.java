@@ -30,7 +30,7 @@ public class StringUtils {
         return var == null || var.length() == 0;
     }
 
-    public static String replaceWithOrder(String template, Object... args) {
+    public static String replaceWithOrder(String template, String... args) {
         if (args.length != 0 && template.length() != 0) {
             char[] arr = template.toCharArray();
             StringBuilder stringBuilder = new StringBuilder(template.length());

@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 
 public class AttributeUtils {
 
@@ -15,7 +14,6 @@ public class AttributeUtils {
 
     private static Class<?> nbtTagCompoundClass;
     private static Class<?> nbtTagListClass;
-    private static Class<?> nmsItemStackClass;
     private static Method asNmsCopyMethod;
     private static Method asCraftMirrorMethod;
     private static Method hasTagMethod;
@@ -23,7 +21,7 @@ public class AttributeUtils {
     private static Method setTagMethod;
     private static Method nbtSetMethod;
 
-    public static boolean setup() {
+    public static void setup() {
         if (isItemFlagExists()) {
             // We can use the new Bukkit API (1.8.3+)
             useItemFlags = true;
@@ -32,7 +30,7 @@ public class AttributeUtils {
                 // Try to get the NMS methods and classes
                 nbtTagCompoundClass = getNmsClass("NBTTagCompound");
                 nbtTagListClass = getNmsClass("NBTTagList");
-                nmsItemStackClass = getNmsClass("ItemStack");
+                Class<?> nmsItemStackClass = getNmsClass("ItemStack");
                 asNmsCopyMethod = getObcClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class);
                 asCraftMirrorMethod = getObcClass("inventory.CraftItemStack").getMethod("asCraftMirror", nmsItemStackClass);
                 hasTagMethod = nmsItemStackClass.getMethod("hasTag");
@@ -44,7 +42,6 @@ public class AttributeUtils {
                 TabooMenu.getTLogger().error("Could not enable the attribute remover for this version (" + e + "). Attributes will show up on items.");
             }
         }
-        return true;
     }
 
     private static Class<?> getNmsClass(String name) throws ClassNotFoundException {
@@ -55,20 +52,19 @@ public class AttributeUtils {
         return Class.forName("org.bukkit.craftbukkit." + VersionUtils.getVersion() + "." + name);
     }
 
-    public static ItemStack hideAttributes(ItemStack item) {
+    public static void hideAttributes(ItemStack item) {
         if (item == null) {
-            return null;
+            return;
         }
         if (useItemFlags) {
             ItemMeta meta = item.getItemMeta();
             meta.addItemFlags(ItemFlag.values());
             item.setItemMeta(meta);
-            return item;
         } else if (useReflection) {
             try {
                 Object nmsItemStack = asNmsCopyMethod.invoke(null, item);
                 if (nmsItemStack == null) {
-                    return item;
+                    return;
                 }
 
                 Object nbtCompound;
@@ -80,20 +76,15 @@ public class AttributeUtils {
                 }
 
                 if (nbtCompound == null) {
-                    return item;
+                    return;
                 }
 
                 Object nbtList = nbtTagListClass.newInstance();
                 nbtSetMethod.invoke(nbtCompound, "AttributeModifiers", nbtList);
-                return (ItemStack) asCraftMirrorMethod.invoke(null, nmsItemStack);
+                asCraftMirrorMethod.invoke(null, nmsItemStack);
             } catch (Exception ignored) {
             }
         }
-        return item;
-    }
-
-    private static boolean isNullOrEmpty(Collection<?> coll) {
-        return coll == null || coll.isEmpty();
     }
 
     private static boolean isItemFlagExists() {

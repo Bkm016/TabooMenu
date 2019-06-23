@@ -8,6 +8,7 @@ import me.skymc.taboomenu.handler.DataHandler;
 import me.skymc.taboomenu.handler.ScriptHandler;
 import me.skymc.taboomenu.handler.itemsource.ItemSourceHandler;
 import me.skymc.taboomenu.inventory.MenuHolder;
+import me.skymc.taboomenu.listener.ListenerChat;
 import me.skymc.taboomenu.listener.ListenerCommand;
 import me.skymc.taboomenu.listener.ListenerInventory;
 import me.skymc.taboomenu.listener.ListenerPlayer;
@@ -21,7 +22,6 @@ import me.skymc.taboomenu.template.TemplateManager;
 import me.skymc.taboomenu.util.AttributeUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
 import me.skymc.taboomenu.util.VersionUtils;
-import me.skymc.taboomenu.version.MaterialControl;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
@@ -48,7 +48,6 @@ public class TabooMenu extends JavaPlugin {
     public void onLoad() {
         inst = this;
         tLogger = TLogger.getUnformatted(this);
-        isNewAPI = MaterialControl.isNewVersion();
     }
 
     @Override
@@ -62,9 +61,9 @@ public class TabooMenu extends JavaPlugin {
         if (PlayerPointsBridge.setupPlayerPoints()) {
             tLogger.finest("Hooked PlayerPoints.");
         }
-        if (isNewAPI) {
-            tLogger.finest("Support 1.13+");
-        }
+//        if (isNewAPI) {
+//            tLogger.finest("Support "+MaterialControl.getVersion().name().substring(8).replace('_', '.')+"+");
+//        }
 
         ScriptHandler.inst();
         AttributeUtils.setup();
@@ -74,6 +73,7 @@ public class TabooMenu extends JavaPlugin {
         Bukkit.getPluginCommand("taboomenu").setExecutor(new TabooMenuCommand());
         Bukkit.getPluginCommand("taboomenu").setTabCompleter(new TabooMenuCommand());
 
+        Bukkit.getPluginManager().registerEvents(new ListenerChat(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerPlayer(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerCommand(), this);
         Bukkit.getPluginManager().registerEvents(new ListenerInventory(), this);
