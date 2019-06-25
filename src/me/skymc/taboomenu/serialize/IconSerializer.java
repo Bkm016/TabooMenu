@@ -30,7 +30,7 @@ import java.util.*;
 public class IconSerializer {
 
     public static boolean isAir(Material material) {
-        return material == null || material == Material.AIR;
+        return material == null || material.equals(Material.AIR);
     }
 
     public static Material getMaterial(String origin) {
@@ -45,7 +45,6 @@ public class IconSerializer {
         }
         return isAir(material) ? getMaterialSimilar(origin) : material;
     }
-
 
     public static Material getMaterialSimilar(String s) {
         String errorMaterial = s.replace(" ", "_");

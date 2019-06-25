@@ -37,6 +37,11 @@ public class PlaceholderHook extends PlaceholderExpansion {
     }
 
     @Override
+    public String getPlugin() {
+        return "TabooMenu";
+    }
+
+    @Override
     public String getAuthor() {
         return "坏黑";
     }
