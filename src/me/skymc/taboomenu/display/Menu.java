@@ -34,7 +34,7 @@ public class Menu {
     private File file;
     private String name;
     private int rows;
-    private double autoRefresh;
+    private int autoRefresh;
     private boolean permissionBypass;
     private boolean ignoreCancelled;
     private String previous;
@@ -71,6 +71,7 @@ public class Menu {
         refresh(player, inventory);
         if (autoRefresh > 0) {
             Optional.ofNullable(refreshTasks.put(player.getName(), new BukkitRunnable() {
+
                 @Override
                 public void run() {
                     if (player.getOpenInventory().getTopInventory().equals(inventory)) {
@@ -79,7 +80,7 @@ public class Menu {
                         cancel();
                     }
                 }
-            }.runTaskTimer(TabooMenu.getInst(), (int) autoRefresh * 20, (int) autoRefresh * 20))).ifPresent(BukkitTask::cancel);
+            }.runTaskTimer(TabooMenu.getInst(), autoRefresh * 20, autoRefresh * 20))).ifPresent(BukkitTask::cancel);
             // 若 runTaskTimerAsynchronously, 在 1.14.2 中会出现报错
             // [TabooMenu] Plugin TabooMenu v2.6 generated an exception while executing task 26
             // java.lang.IllegalStateException: IconViewEvent may only be triggered synchronously.
@@ -164,11 +165,11 @@ public class Menu {
         this.rows = rows;
     }
 
-    public double getAutoRefresh() {
+    public int getAutoRefresh() {
         return autoRefresh;
     }
 
-    public void setAutoRefresh(double autoRefresh) {
+    public void setAutoRefresh(int autoRefresh) {
         this.autoRefresh = autoRefresh;
     }
 
