@@ -8,20 +8,8 @@ import org.bukkit.Bukkit;
  */
 public class TabooLibHook {
 
-    private static boolean tabooLibEnabled;
-
-    public static boolean setupTabooLib() {
-        return tabooLibEnabled = Bukkit.getPluginManager().getPlugin("TabooLib") != null;
-    }
-
-    // *********************************
-    //
-    //        Getter and Setter
-    //
-    // *********************************
-
     public static boolean isTabooLibEnabled() {
-        return tabooLibEnabled;
+        return Bukkit.getPluginManager().getPlugin("TabooLib") != null;
     }
 
 }
