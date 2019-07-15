@@ -33,7 +33,7 @@ public class IconSerializer {
         return material == null || material.equals(Material.AIR);
     }
 
-    public static Material getMaterial(String origin) {
+    public static Material getMaterial(String origin, byte data) {
         Material material = null;
         if (!StringUtils.isInt(origin)) {
             try {
@@ -41,7 +41,8 @@ public class IconSerializer {
             } catch (NullPointerException ignored) {
             }
         } else if (!MaterialControl.isNewVersion()) {
-            material = MaterialControl.matchXMaterial(Integer.valueOf(origin), (byte) 0).parseMaterial();
+            MaterialControl mc = MaterialControl.matchXMaterial(Integer.valueOf(origin), data);
+            material = mc != null ? mc.parseMaterial() : Material.BEDROCK;
         }
         return isAir(material) ? getMaterialSimilar(origin) : material;
     }
@@ -62,8 +63,8 @@ public class IconSerializer {
 
     public static Icon loadIconFromMap(Map<String, Object> map, String iconName, String fileName, int requirementIndex, List<String> errors) {
         String[] material = MapUtils.getSimilarOrDefault(map, IconSettings.ID.getText(), (Object) "air").toString().toUpperCase().replace(" ", "_").split(":");
-
-        Icon icon = new Icon(getMaterial(material[0]), material.length > 1 ? NumberConversions.toShort(material[1]) : 0, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
+        byte data = material.length > 1 ? NumberConversions.toByte(material[1]) : NumberConversions.toByte(MapUtils.getSimilarOrDefault(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0));
+        Icon icon = new Icon(getMaterial(material[0], data), data, MapUtils.getSimilarOrDefault(map, IconSettings.AMOUNT.getText(), 1));
         icon.setIconName(iconName);
         icon.setMenuName(fileName);
         icon.setRequirementIndex(requirementIndex);
@@ -140,9 +141,6 @@ public class IconSerializer {
         icon.setHideAttribute(MapUtils.getSimilarOrDefault(map, IconSettings.HIDE_ATTRIBUTE.getText(), true));
         icon.setUnbreakable(MapUtils.getSimilarOrDefault(map, IconSettings.UNBREAKABLE.getText(), false));
 
-        if (MapUtils.containsSimilar(map, IconSettings.DEPRECATED_DATA_VALUE.getText())) {
-            icon.setData(MapUtils.getSimilarOrDefault(map, IconSettings.DEPRECATED_DATA_VALUE.getText(), 0).shortValue());
-        }
         if (MapUtils.containsSimilar(map, IconSettings.REQUIREMENT.getText())) {
             loadRequirements(map, iconName, fileName, errors, icon);
         }

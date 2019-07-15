@@ -1197,7 +1197,6 @@ public enum MaterialControl {
      * @return some MaterialControl, or null.
      */
     public static MaterialControl matchXMaterial(int id, byte data) {
-        // Looping through Material.values() will take longer.
         return Arrays.stream(MaterialControl.VALUES).filter(mat -> mat.getId() == id && mat.data == data).findFirst().orElse(null);
     }
 
@@ -1334,7 +1333,7 @@ public enum MaterialControl {
      */
     private static MinecraftVersion valueOfVersion(String version) {
         version = getExactMajorVersion(version);
-        if (version.equals("1.10") || version.equals("1.11") || version.equals("1.12"))
+        if ("1.10".equals(version) || "1.11".equals(version) || "1.12".equals(version))
             return MinecraftVersion.VERSION_1_9;
         version = version.replace(".", "_");
         if (!version.startsWith("VERSION_")) version = "VERSION_" + version;
@@ -1366,7 +1365,7 @@ public enum MaterialControl {
      */
     @SuppressWarnings("deprecation")
     public int getId() {
-        return this.isNew() ? -1 : this.parseMaterial().getId();
+        return isNew() ? -1 : parseMaterial() != null ? parseMaterial().getId() : -1;
     }
 
     public boolean isDuplicated() {
