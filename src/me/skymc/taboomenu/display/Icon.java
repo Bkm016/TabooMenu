@@ -125,7 +125,7 @@ public class Icon implements Cloneable {
         for (IconCommand iconCommand : iconCommands) {
             if (iconCommand.getCommands().get(0) instanceof IconCommandDelay) {
                 delay += ((IconCommandDelay) iconCommand.getCommands().get(0)).getDelay();
-            } else if (random.nextDouble() <= iconCommand.getChange()) {
+            } else if (random.nextDouble() <= iconCommand.getChance()) {
                 Bukkit.getScheduler().runTaskLater(TabooMenu.getInst(), () -> iconCommand.getCommands().forEach(command -> command.execute(player)), delay);
             }
         }

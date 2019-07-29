@@ -63,7 +63,7 @@ public class Menu {
             player.openInventory(inventory);
         } catch (Exception e) {
             player.sendMessage("§cAn internal error occurred while opening the menu:");
-            player.sendMessage("§c" + e.toString());
+            e.printStackTrace();
         }
     }
 
@@ -81,7 +81,7 @@ public class Menu {
                     }
                 }
             }.runTaskTimer(TabooMenu.getInst(), autoRefresh * 20, autoRefresh * 20))).ifPresent(BukkitTask::cancel);
-            // 若 runTaskTimerAsynchronously, 在 1.14.2 中会出现报错
+            // 若 runTaskTimerAsynchronously, 在 1.14+ 中会出现报错
             // [TabooMenu] Plugin TabooMenu v2.6 generated an exception while executing task 26
             // java.lang.IllegalStateException: IconViewEvent may only be triggered synchronously.
         }
