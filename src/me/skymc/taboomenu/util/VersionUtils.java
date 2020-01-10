@@ -40,6 +40,8 @@ public class VersionUtils {
             return 11300;
         } else if (version.startsWith("v1_14")) {
             return 11400;
+        } else if (version.startsWith("v1_15")) {
+            return 11500;
         }
         return 0;
     }

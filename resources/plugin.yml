@@ -2,9 +2,9 @@ name: TabooMenu
 main: me.skymc.taboomenu.TabooMenu
 
 api-version: 1.13
-version: 2.62
+version: 2.63
 
-author: [filoghost, 坏黑, Arasple]
+authors: [filoghost, 坏黑, Arasple]
 softdepend: [Vault, PlayerPoints, PlaceholderAPI, TabooLib, TabooScript]
 
 commands:
