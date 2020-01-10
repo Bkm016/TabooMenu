@@ -19,6 +19,11 @@ public class PlaceholderHook extends PlaceholderExpansion {
     private HashMap<String, RequiredItem> requiredItems = new HashMap<>();
 
     @Override
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
     public String onPlaceholderRequest(Player player, String s) {
         if ("money".equalsIgnoreCase(s)) {
             return EconomyBridge.formatMoney(EconomyBridge.getMoney(player));
@@ -45,11 +50,6 @@ public class PlaceholderHook extends PlaceholderExpansion {
     @Override
     public String getIdentifier() {
         return "taboomenu";
-    }
-
-    @Override
-    public String getPlugin() {
-        return "TabooMenu";
     }
 
     @Override

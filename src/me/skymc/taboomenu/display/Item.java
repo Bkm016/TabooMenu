@@ -48,7 +48,7 @@ public class Item {
         ItemMeta itemMeta = itemStack.getItemMeta();
 
         if (!StringUtils.isBlank(icon.getSkullTexture()) && itemMeta instanceof SkullMeta) {
-            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(icon.getSkullTexture(), x -> SkullUtils.getTextureSkull(icon.getSkullTexture()));
+            itemStack = DataHandler.getTextureSkulls().computeIfAbsent(icon.getSkullTexture(), e -> SkullUtils.getTextureSkull(icon.getSkullTexture()));
             itemMeta = itemStack.getItemMeta();
         }
 
@@ -66,6 +66,8 @@ public class Item {
 
         if (icon.getLore() != null) {
             itemMeta.setLore(TranslateUtils.format(player, icon.getLore()));
+        } else {
+            itemMeta.setLore(null);
         }
 
         if (icon.getColor() != null && itemMeta instanceof LeatherArmorMeta) {

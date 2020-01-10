@@ -27,15 +27,13 @@ public class IconCommandSerializer {
         commandTypes.put(commandPattern("broadcast:"), IconCommandBroadcast.class);
         commandTypes.put(commandPattern("console:"), IconCommandConsole.class);
         commandTypes.put(commandPattern("player:"), IconCommandPlayer.class);
+        commandTypes.put(commandPattern("rcmd:"), IconCommandRandomCommand.class);
         commandTypes.put(commandPattern("(server|connect):"), IconCommandServer.class);
         commandTypes.put(commandPattern("sound:"), IconCommandSound.class);
         commandTypes.put(commandPattern("sound-(all|broadcast):"), IconCommnadSoundBroadcast.class);
         commandTypes.put(commandPattern("op:"), IconCommandOp.class);
         commandTypes.put(commandPattern("open:"), IconCommandOpen.class);
         commandTypes.put(commandPattern("open-force:"), IconCommandOpenForce.class);
-        commandTypes.put(commandPattern("prompte(r)?-console:"), IconCommandPrompterConsole.class);
-        commandTypes.put(commandPattern("prompte(r)?-player:"), IconCommandPrompterPlayer.class);
-        commandTypes.put(commandPattern("prompte(r)?-op:"), IconCommandPrompterOp.class);
         commandTypes.put(commandPattern("(delay|wait):"), IconCommandDelay.class);
         commandTypes.put(commandPattern("(take|remove)-(money|balance):"), IconCommandTakeMoney.class);
         commandTypes.put(commandPattern("(give|add)-(money|balance):"), IconCommandGiveMoney.class);

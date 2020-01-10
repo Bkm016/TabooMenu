@@ -13,12 +13,12 @@ public class IconCommand {
 
     private List<AbstractIconCommand> commands;
     private List<ClickType> clickType;
-    private double change;
+    private double chance;
 
-    public IconCommand(List<AbstractIconCommand> commands, double change, ClickType... clickType) {
+    public IconCommand(List<AbstractIconCommand> commands, double chance, ClickType... clickType) {
         this.commands = commands;
         this.clickType = Arrays.asList(clickType);
-        this.change = change;
+        this.chance = chance;
     }
 
     @Override
@@ -51,11 +51,12 @@ public class IconCommand {
         this.clickType = clickType;
     }
 
-    public double getChange() {
-        return change;
+    public double getChance() {
+        return chance;
     }
 
-    public void setChange(double change) {
-        this.change = change;
+    public void setChance(double chance) {
+        this.chance = chance;
     }
+
 }

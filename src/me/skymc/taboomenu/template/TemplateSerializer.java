@@ -1,6 +1,5 @@
 package me.skymc.taboomenu.template;
 
-import com.google.common.collect.ImmutableMap;
 import me.skymc.taboomenu.util.SkullUtils;
 import me.skymc.taboomenu.util.StringUtils;
 import me.skymc.taboomenu.util.TranslateUtils;
@@ -77,7 +76,7 @@ public class TemplateSerializer {
         } else {
             String skullTexture = SkullUtils.getTexture(item);
             if (skullTexture != null) {
-                map.put("skull-texture", ImmutableMap.of("id", null, "texture", skullTexture));
+                map.put("skull-texture", skullTexture);
             }
         }
     }
