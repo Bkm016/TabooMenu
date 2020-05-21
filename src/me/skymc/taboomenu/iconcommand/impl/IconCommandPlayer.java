@@ -18,6 +18,7 @@ public class IconCommandPlayer extends AbstractIconCommand {
 
     @Override
     public void execute(Player player) {
+        if (command.startsWith("/")) command = command.substring(1);
         player.chat("/" + TranslateUtils.format(player, command));
     }
 
