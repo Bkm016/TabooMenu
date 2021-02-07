@@ -19,6 +19,7 @@ public class IconCommandConsole extends AbstractIconCommand {
 
     @Override
     public void execute(Player player) {
+        if (command.startsWith("/")) command = command.substring(1);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), TranslateUtils.format(player, command));
     }
 
